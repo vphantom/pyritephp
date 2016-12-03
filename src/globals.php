@@ -132,3 +132,4 @@ Pyrite\Router::bootstrap();
 Pyrite\Session::bootstrap();
 Pyrite\Sendmail::bootstrap();
 Pyrite\Templating::bootstrap();
+Pyrite\Users::bootstrap();
