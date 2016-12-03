@@ -35,12 +35,13 @@ class ACL
      */
     public static function bootstrap()
     {
-        on('install',    'Pyrite\ACL::install');
-        on('newuser',    'Pyrite\ACL::reload');
-        on('can',        'Pyrite\ACL::can');
-        on('grant',      'Pyrite\ACL::grant');
-        on('revoke',     'Pyrite\ACL::revoke');
-        on('user_roles', 'Pyrite\ACL::getRoles');
+        on('install',     'Pyrite\ACL::install');
+        on('newuser',     'Pyrite\ACL::reload');
+        on('can',         'Pyrite\ACL::can');
+        on('grant',       'Pyrite\ACL::grant');
+        on('revoke',      'Pyrite\ACL::revoke');
+        on('user_roles',  'Pyrite\ACL::getRoles');
+        on('role_rights', 'Pyrite\ACL::getRoleACL');
     }
 
     /**
@@ -251,6 +252,9 @@ class ACL
         global $PPHP;
         $db = $PPHP['db'];
 
+        if ($objectId === '') {
+            $objectId = 0;
+        };
         if ($userId !== null  &&  $role !== null) {
             return $db->insert(
                 'users_roles',
@@ -311,6 +315,9 @@ class ACL
         global $PPHP;
         $db = $PPHP['db'];
 
+        if ($objectId === '') {
+            $objectId = 0;
+        };
         if ($userId !== null  &&  $role !== null) {
             return $db->exec(
                 "
@@ -365,5 +372,31 @@ class ACL
         $db = $PPHP['db'];
         $roles = $db->selectList("SELECT role FROM users_roles WHERE userId=?", array($userId));
         return $roles !== false ? $roles : array();
+    }
+
+    /**
+     * Get permissions associated with a role
+     *
+     * Each permissions is an associative array with keys: action, objectType,
+     * objectId.  Wildcards are respectively '*', '*' and 0.
+     *
+     * @param string $role Name of role
+     *
+     * @return array
+     */
+    public static function getRoleACL($role)
+    {
+        global $PPHP;
+        $db = $PPHP['db'];
+
+        $flat = $db->selectArray(
+            "
+            SELECT action, objectType, objectId
+            FROM acl_roles
+            WHERE role=?
+            ",
+            array($role)
+        );
+        return is_array($flat) ? $flat : array();
     }
 }
