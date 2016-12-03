@@ -2,7 +2,7 @@
 
 PyritePHP Core
 
-This is intended as the core dependency for [PyritePHP](https://github.com/vphantom/pyrite-php) based projects.
+This is intended as the core dependency for [PyritePHP](https://github.com/vphantom/pyrite-php) based projects.  Please see that project for documentation and to report bugs.
 
 ## Usage
 
