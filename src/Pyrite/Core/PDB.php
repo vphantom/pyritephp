@@ -303,7 +303,7 @@ class PDB
     public function selectList($q, $args = array())
     {
         $this->exec($q, $args);
-        return $this->_sth ? $this->_sth->fetchAll(PDO::FETCH_COLUMN, 0) : false;
+        return $this->_sth ? $this->_sth->fetchAll(\PDO::FETCH_COLUMN, 0) : false;
     }
 
     /**
@@ -324,7 +324,7 @@ class PDB
     public function selectSingleArray($q, $args = array())
     {
         $this->exec($q, $args);
-        return $this->_sth ? $this->_sth->fetch(PDO::FETCH_ASSOC) : false;
+        return $this->_sth ? $this->_sth->fetch(\PDO::FETCH_ASSOC) : false;
     }
 
     /**
@@ -338,7 +338,7 @@ class PDB
     public function selectArray($q, $args = array())
     {
         $this->exec($q, $args);
-        return $this->_sth ? $this->_sth->fetchAll(PDO::FETCH_ASSOC) : false;
+        return $this->_sth ? $this->_sth->fetchAll(\PDO::FETCH_ASSOC) : false;
     }
 
     /**
@@ -357,7 +357,7 @@ class PDB
         $this->exec($q, $args);
         if ($this->_sth) {
             $result = array();
-            while ($row = $this->_sth->fetch(PDO::FETCH_ASSOC)) {
+            while ($row = $this->_sth->fetch(\PDO::FETCH_ASSOC)) {
                 $result[$row[key($row)]] = $row;
             };
             return $result;
@@ -380,7 +380,7 @@ class PDB
     public function selectArrayPairs($q, $args = array())
     {
         $this->exec($q, $args);
-        return $this->_sth ? $this->_sth->fetchAll(PDO::FETCH_COLUMN | PDO::FETCH_GROUP) : false;
+        return $this->_sth ? $this->_sth->fetchAll(\PDO::FETCH_COLUMN | \PDO::FETCH_GROUP) : false;
     }
 
 }
