@@ -68,6 +68,8 @@ class Pyrite
     {
         global $PPHP;
 
+        $PPHP['dir'] = $dir;
+
         // Load configuration
         $PPHP['config'] = parse_ini_file('config.ini', true);
 
@@ -78,10 +80,10 @@ class Pyrite
         };
 
         // Database
-        $PPHP['db'] = new Pyrite\Core\PDB($PPHP['config']['db']['type'] . ':' . $dir . '/' . $PPHP['config']['db']['sqlite_path']);
+        $PPHP['db'] = new Pyrite\Core\PDB($PPHP['config']['db']['type'] . ':' . $PPHP['dir'] . '/' . $PPHP['config']['db']['sqlite_path']);
 
         // Load local install's modules
-        foreach (glob($dir . '/modules/*.php') as $fname) {
+        foreach (glob($PPHP['dir'] . '/modules/*.php') as $fname) {
             include_once $fname;
         };
 
@@ -125,4 +127,5 @@ class Pyrite
 
 // Included modules which have start-up definitions
 Pyrite\Router::bootstrap();
+Pyrite\Session::bootstrap();
 Pyrite\Sendmail::bootstrap();
