@@ -9,7 +9,11 @@
 		}
 	],
 	"require": {
-		"php": ">=5.5.0",
+		"php": "~5.5",
+		"ext-mcrypt": "*",
+		"ext-pdo_sqlite": "*",
+		"ext-readline": "*",
+		"ext-session": "*",
 		"twig/twig": "~1.0",
 		"sphido/events": "^0.3.0"
 	},

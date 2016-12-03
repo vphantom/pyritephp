@@ -7,7 +7,7 @@ This is intended as the core dependency for [PyritePHP](https://github.com/vphan
 ## Usage
 
 ```sh
-$ composer install pyritephp-core
+$ composer require vphantom/pyritephp-core
 ```
 
 Note that this is done automatically when setting up a PyritePHP project with its `make init` (including installing Composer itself locally).
