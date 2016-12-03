@@ -41,6 +41,7 @@ class ACL
         on('grant',       'Pyrite\ACL::grant');
         on('revoke',      'Pyrite\ACL::revoke');
         on('user_roles',  'Pyrite\ACL::getRoles');
+        on('user_rights', 'Pyrite\ACL::getUserACL');
         on('role_rights', 'Pyrite\ACL::getRoleACL');
     }
 
@@ -396,6 +397,32 @@ class ACL
             WHERE role=?
             ",
             array($role)
+        );
+        return is_array($flat) ? $flat : array();
+    }
+
+    /**
+     * Get permissions associated with a user
+     *
+     * Each permissions is an associative array with keys: action, objectType,
+     * objectId.  Wildcards are respectively '*', '*' and 0.
+     *
+     * @param string $userId Name of role
+     *
+     * @return array
+     */
+    public static function getUserACL($userId)
+    {
+        global $PPHP;
+        $db = $PPHP['db'];
+
+        $flat = $db->selectArray(
+            "
+            SELECT action, objectType, objectId
+            FROM acl_users
+            WHERE userId=?
+            ",
+            array($userId)
         );
         return is_array($flat) ? $flat : array();
     }
