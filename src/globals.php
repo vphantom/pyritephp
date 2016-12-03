@@ -91,9 +91,6 @@ class Pyrite
             return;
         };
 
-        // Router is mandatory and has events to handle
-        Pyrite\Router::bootstrap();
-
         // Start up
         trigger('startup');
         if (array_key_exists('base_title', $PPHP['config']['global'])) {
@@ -125,3 +122,7 @@ class Pyrite
         trigger('shutdown');
     }
 }
+
+// Included modules which have start-up definitions
+Pyrite\Router::bootstrap();
+Pyrite\Sendmail::bootstrap();
