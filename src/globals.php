@@ -126,6 +126,9 @@ class Pyrite
 }
 
 // Included modules which have start-up definitions
+Pyrite\ACL::bootstrap();
+Pyrite\AuditTrail::bootstrap();
 Pyrite\Router::bootstrap();
 Pyrite\Session::bootstrap();
 Pyrite\Sendmail::bootstrap();
+Pyrite\Templating::bootstrap();
