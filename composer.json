@@ -1,0 +1,25 @@
+{
+	"name": "vphantom/pyritephp-core",
+	"description": "PyritePHP Core",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Stéphane Lavergne",
+			"email": "lis@imars.com"
+		}
+	],
+	"require": {
+		"php": ">=5.5.0",
+		"twig/twig": "~1.0",
+		"sphido/events": "^0.3.0"
+	},
+	"require-dev": {},
+	"autoload": {
+		"psr-4": {
+			"Pyrite\\": "src/Pyrite"
+		},
+		"files": [
+			"src/globals.php"
+		]
+	}
+}
