@@ -90,7 +90,7 @@ class Pyrite
         // From the command line means install mode
         if (php_sapi_name() === 'cli') {
             trigger('install');
-            return;
+            exit;
         };
 
         // Start up
