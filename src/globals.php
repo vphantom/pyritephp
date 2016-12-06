@@ -123,7 +123,39 @@ class Pyrite
     {
         trigger('shutdown');
     }
+
+    /**
+     * Sanitize e-mail address
+     *
+     * @param string $email String to filter
+     *
+     * @return string
+     */
+    function cleanEmail($email)
+    {
+        // filter_var()'s FILTER_SANITIZE_EMAIL is way too permissive
+        return preg_replace('/[^a-zA-Z0-9@.,_+-]/', '', $email);
+    }
+
+    /**
+     * Strip low-ASCII and <>`|\"' from string
+     *
+     * @param string $name String to filter
+     *
+     * @return string
+     */
+    function cleanName($name)
+    {
+        return preg_replace(
+            '/[<>`|\\"\']/',
+            '',
+            filter_var($name, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES|FILTER_FLAG_STRIP_LOW)
+        );
+    }
 }
+
+add_filter('clean_email', 'Pyrite::cleanEmail');
+add_filter('clean_name',  'Pyrite::cleanName');
 
 // Included modules which have start-up definitions
 Pyrite\ACL::bootstrap();
