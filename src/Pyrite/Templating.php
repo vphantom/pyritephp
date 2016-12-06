@@ -91,14 +91,16 @@ class Templating
         $twig->addFunction(
             new \Twig_SimpleFunction(
                 'grab', function () {
-                    return array_pop(call_user_func_array('trigger', func_get_args()));
+                    $result = call_user_func_array('trigger', func_get_args());
+                    return array_pop($result);
                 }
             )
         );
         $twig->addFunction(
             new \Twig_SimpleFunction(
                 'pass', function () {
-                    return array_pop(call_user_func_array('trigger', func_get_args())) !== false;
+                    $result = call_user_func_array('trigger', func_get_args());
+                    return array_pop($result) !== false;
                 }
             )
         );

@@ -28,7 +28,8 @@ $GLOBALS['PPHP'] = array();
  */
 function grab()
 {
-    return array_pop(call_user_func_array('trigger', func_get_args()));
+    $result = call_user_func_array('trigger', func_get_args());
+    return array_pop($result);
 };
 
 /**
@@ -40,7 +41,8 @@ function grab()
  */
 function pass()
 {
-    return array_pop(call_user_func_array('trigger', func_get_args())) !== false;
+    $result = call_user_func_array('trigger', func_get_args());
+    return array_pop($result) !== false;
 };
 
 /**
