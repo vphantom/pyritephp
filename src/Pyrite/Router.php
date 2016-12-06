@@ -90,7 +90,8 @@ class Router
 
         self::$_req['status'] = 200;
         self::$_req['redirect'] = false;
-        self::$_PATH = explode('/', trim($_SERVER['PATH_INFO'], '/'));
+        $parsedURL = parse_url($_SERVER['REQUEST_URI']);
+        self::$_PATH = explode('/', trim($parsedURL['path'], '/'));
         while (count(self::$_PATH) > 0 && self::$_PATH[0] === '') {
             array_shift(self::$_PATH);
         };
@@ -105,7 +106,7 @@ class Router
         self::$_req['base'] = ($lang === $PPHP['config']['global']['default_lang'] ? '' : "/{$lang}");
 
         self::$_req['path'] = implode('/', self::$_PATH);
-        self::$_req['query'] = ($_SERVER['QUERY_STRING'] !== '' ? '?' . $_SERVER['QUERY_STRING'] : '');
+        self::$_req['query'] = (isset($parsedURL['query']) ? '?' . $parsedURL['query'] : '');
         self::$_req['host'] = $_SERVER['HTTP_HOST'];
         self::$_req['remote_addr'] = self::_remoteIP();
         self::$_req['ssl']
