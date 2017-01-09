@@ -97,8 +97,8 @@ class Pyrite
 
         // Start up
         trigger('startup');
-        if (array_key_exists('base_title', $PPHP['config']['global'])) {
-            trigger('title', $PPHP['config']['global']['base_title']);
+        if (array_key_exists('name', $PPHP['config']['global'])) {
+            trigger('title', $PPHP['config']['global']['name']);
         };
     }
 
