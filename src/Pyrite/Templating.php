@@ -165,6 +165,7 @@ class Templating
             self::$_template->displayBlock(
                 'head',
                 array(
+                    'config' => $PPHP['config'],
                     'session' => $_SESSION,
                     'req' => grab('request')
                 )
@@ -183,6 +184,8 @@ class Templating
      */
     public static function shutdown()
     {
+        global $PPHP;
+
         $body = ob_get_contents();
         ob_end_clean();
         try {
@@ -192,6 +195,7 @@ class Templating
                     'title' => self::$_title,
                     'body' => self::$_safeBody,
                     'stdout' => $body,
+                    'config' => $PPHP['config'],
                     'session' => $_SESSION,
                     'req' => grab('request')
                 )
@@ -250,10 +254,13 @@ class Templating
      */
     public static function render($name, $args = array())
     {
+        global $PPHP;
+
         $env = array_merge(
             $args,
             array(
                 'title' => self::$_title,
+                'config' => $PPHP['config'],
                 'session' => $_SESSION,
                 'req' => grab('request')
             )
@@ -275,9 +282,12 @@ class Templating
      */
     public static function renderBlocks($name, $args = array())
     {
+        global $PPHP;
+
         $env = array_merge(
             $args,
             array(
+                'config' => $PPHP['config'],
                 'session' => $_SESSION,
                 'req' => grab('request')
             )
