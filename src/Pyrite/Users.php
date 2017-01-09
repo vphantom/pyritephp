@@ -271,8 +271,9 @@ class Users
             unset($cols['id']);
         };
 
-        if (isset($cols['password'])) {
+        if (isset($cols['password']) && strlen($cols['password']) > 0) {
             $cols['passwordHash'] = password_hash($cols['password'], PASSWORD_DEFAULT);
+            // Else passwordHash will be '*' per table definition
         };
         if (isset($cols['onetime'])) {
             $onetime = md5(mcrypt_create_iv(32, MCRYPT_DEV_URANDOM));
