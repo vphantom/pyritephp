@@ -154,6 +154,7 @@ class Router
         } else {
             trigger('http_status', 404);
         };
+        self::$_req['path_args'] = self::$_PATH;
     }
 
     /**

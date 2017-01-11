@@ -127,6 +127,20 @@ class Pyrite
     }
 
     /**
+     * Sanitize file name
+     *
+     * This is for base file names: slashes and dots are filtered out.
+     *
+     * @param string $name String to filter
+     *
+     * @return string
+     */
+    function cleanFilename($name)
+    {
+        return preg_replace('/[^a-zA-Z0-9_-]/', '', $name);
+    }
+
+    /**
      * Sanitize e-mail address
      *
      * @param string $email String to filter
@@ -156,8 +170,9 @@ class Pyrite
     }
 }
 
-add_filter('clean_email', 'Pyrite::cleanEmail');
-add_filter('clean_name',  'Pyrite::cleanName');
+add_filter('clean_filename', 'Pyrite::cleanFilename');
+add_filter('clean_email',    'Pyrite::cleanEmail');
+add_filter('clean_name',     'Pyrite::cleanName');
 
 // Included modules which have start-up definitions
 Pyrite\ACL::bootstrap();
@@ -170,6 +185,14 @@ Pyrite\Users::bootstrap();
 
 
 // Framework-related routes
+
+on(
+    'route/page',
+    function ($path) {
+        $req = grab('request');
+        return trigger('render', filter('clean_filename', $path[0]) . '.html');
+    }
+);
 
 on(
     'route/login',
