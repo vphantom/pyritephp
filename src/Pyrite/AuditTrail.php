@@ -154,16 +154,20 @@ class AuditTrail
      * restriction is required; it is not allowed to load the entire global
      * history at once.
      *
+     * Any argument can be a value to restrict for, or an array of values.
+     * For example, to get logins and object creations of any type, $action
+     * could be array('login','created').
+     *
      * Note that 'timestamp' is in UTC and 'localtimestamp' is added to the
      * results in the server's local timezone for convenience.
      *
      * You can either use these positional arguments or specify a single
      * associative array argument with only the keys you need defined.
      *
-     * @param int|null        $userId     Specific actor (*or args, see above)
-     * @param array|string    $objectType Class of object this applies to
+     * @param array|int|null  $userId     Specific actor (*or args, see above)
+     * @param string|null     $objectType Class of object this applies to
      * @param string|int|null $objectId   Specific instance acted upon
-     * @param string          $action     Type of action performed
+     * @param string|null     $action     Type of action performed
      * @param string|null     $fieldName  Specific field affected
      * @param string|null     $order      Either 'DESC' or 'ASC'
      * @param int|null        $max        LIMIT rows returned
@@ -176,7 +180,7 @@ class AuditTrail
         $db = $PPHP['db'];
 
         $args = array();
-        if (is_array($userId)) {
+        if (is_array($userId) && !isset($userId[0])) {
             $args = $userId;
             if (isset($args['order'])) {
                 $order = $args['order'];
@@ -202,8 +206,20 @@ class AuditTrail
         $queryArgs = array();
         $queryChunks = array();
         foreach ($args as $key => $val) {
-            $queryChunks[] = "{$key}=?";
-            $queryArgs[] = $val;
+            if (is_array($val)) {
+                $chunk = '(';
+                $chunkAlts = array();
+                foreach ($val as $altVal) {
+                    $chunkAlts[] = "{$key}=?";
+                    $queryArgs[] = $altVal;
+                };
+                $chunk .= implode(' OR ', $chunkAlts);
+                $chunk .= ')';
+                $queryChunks[] = $chunk;
+            } else {
+                $queryChunks[] = "{$key}=?";
+                $queryArgs[] = $val;
+            };
         };
         $query .= implode(' AND ', $queryChunks);
         $query .= " ORDER BY id {$order}";
