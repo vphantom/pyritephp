@@ -166,7 +166,12 @@ class Session
             $_SESSION['user'] = $user;
             $_SESSION['identified'] = true;
             trigger('newuser');
-            return true;
+            if (pass('can', 'login')) {
+                return true;
+            } else {
+                self::reset();
+                return false;
+            };
         } else {
             return false;
         };
