@@ -190,7 +190,7 @@ on(
     'route/page',
     function ($path) {
         $req = grab('request');
-        return trigger('render', filter('clean_filename', $path[0]) . '.html');
+        return trigger('render', 'pages/' . filter('clean_filename', $path[0]) . '.html');
     }
 );
 
