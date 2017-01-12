@@ -76,8 +76,8 @@ class ACL
         );
         foreach ($PPHP['config']['acl']['grant'] as $right) {
             $rightParts = preg_split('/[\s]+/', $right);
-            if (!$db->selectAtom("SELECT role FROM acl_roles WHERE role=? AND action=? AND objectType=? AND objectId=?", $rightParts)) {
-                $db->exec("INSERT INTO acl_roles VALUES (?,?,?,?)", $rightParts);
+            if (!$db->selectAtom("SELECT role FROM acl_roles WHERE role=? AND action=? AND objectType=? AND objectId='0'", $rightParts)) {
+                $db->exec("INSERT INTO acl_roles VALUES (?,?,?,'0')", $rightParts);
             };
         };
 
