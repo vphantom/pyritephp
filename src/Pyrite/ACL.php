@@ -74,11 +74,11 @@ class ACL
             ON acl_roles (role, action, objectType, objectId)
             "
         );
-        if (!$db->selectAtom("SELECT role FROM acl_roles WHERE role='admin' AND action='*'")) {
-            $db->exec("INSERT INTO acl_roles VALUES ('admin', '*', '*', '0')");
-        };
-        if (!$db->selectAtom("SELECT role FROM acl_roles WHERE role='member' AND action='login'")) {
-            $db->exec("INSERT INTO acl_roles VALUES ('member', 'login', '*', '0')");
+        foreach ($PPHP['config']['acl']['grant'] as $right) {
+            $rightParts = preg_split('/[\s]+/', $right);
+            if (!$db->selectAtom("SELECT role FROM acl_roles WHERE role=? AND action=? AND objectType=? AND objectId=?", $rightParts)) {
+                $db->exec("INSERT INTO acl_roles VALUES (?,?,?,?)", $rightParts);
+            };
         };
 
         $db->exec(
