@@ -55,8 +55,15 @@ class Users
     {
         global $PPHP;
         $db = $PPHP['db'];
+
         echo "    Installing users...\n";
         $db->begin();
+        $customs = '';
+        if (isset($PPHP['config']['users']['fields'])) {
+            foreach ($PPHP['config']['users']['fields'] as $name => $definition) {
+                $customs .= "                {$name} {$definition},\n";
+            };
+        };
         $db->exec(
             "
             CREATE TABLE IF NOT EXISTS 'users' (
@@ -65,6 +72,7 @@ class Users
                 passwordHash VARCHAR(255) NOT NULL DEFAULT '*',
                 onetimeHash  VARCHAR(255) NOT NULL DEFAULT '*',
                 onetimeTime  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                {$customs}
                 name         VARCHAR(255) NOT NULL DEFAULT ''
             )
             "
