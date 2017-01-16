@@ -169,7 +169,7 @@ class PDBquery
     /**
      * Append one/multiple straight values, wrapped in parenthesis
      *
-     * This is identical to appendValues() except '(' and ')' are wrapped
+     * This is identical to vars() except '(' and ')' are wrapped
      * around the insertion.
      *
      * @param array $args List of values to append (with placeholders)
