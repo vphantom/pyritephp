@@ -135,7 +135,7 @@ class PDBquery
      *
      * @return object PDBquery this same object, for chaining
      */
-    public function appendValues($args)
+    public function vars($args)
     {
         $this->_query .= implode(',', array_fill(0, count($args), '?'));
         foreach ($args as $arg) {
@@ -152,7 +152,7 @@ class PDBquery
      *
      * @return object PDBquery this same object, for chaining
      */
-    public function appendJoin($glue, $queries)
+    public function implode($glue, $queries)
     {
         $first = true;
         foreach ($queries as $query) {
@@ -176,10 +176,10 @@ class PDBquery
      *
      * @return object PDBquery this same object, for chaining
      */
-    public function appendValuesClosed($args)
+    public function varsClosed($args)
     {
         $this->_query .= ' (';
-        $this->appendValues($args);
+        $this->vars($args);
         $this->_query .= ' )';
         return $this;
     }
@@ -187,18 +187,18 @@ class PDBquery
     /**
      * Append multiple PDBquery objects, wrapped in parenthesis
      *
-     * This is identical to appendJoin() except '(' and ')' are wrapped around
-     * the insertion.
+     * This is identical to our implode() except '(' and ')' are wrapped
+     * around the insertion.
      *
      * @param string $glue    What to insert between joined queries
      * @param array  $queries PDBquery objects or strings to join
      *
      * @return object PDBquery this same object, for chaining
      */
-    public function appendJoinClosed($glue, $queries)
+    public function implodeClosed($glue, $queries)
     {
         $this->_query .= ' (';
-        $this->appendJoin($glue, $queries);
+        $this->implode($glue, $queries);
         $this->_query .= ' )';
         return $this;
     }
@@ -248,7 +248,7 @@ class PDB
      *
      * @return object PDBquery object
      */
-    public function query($query, $args)
+    public function query($query = null, $args = null)
     {
         return new PDBquery($query, $args);
     }
@@ -423,7 +423,8 @@ class PDB
                 };
             };
         };
-        $query->appendJoinClosed(',', $cols)->append('VALUES')->appendJoinClosed(',', $colQs);
+        $query->implodeClosed(',', $cols)->append('VALUES')->implodeClosed(',', $colQs);
+        print_r($query);
         return
             $this->_prepare($query->getQuery())->_execute($query->getArgs())
             ? $this->_dbh->lastInsertId()
@@ -470,7 +471,7 @@ class PDB
                 };
             };
         };
-        $query->appendJoin(',', $cols)->append($tail);
+        $query->implode(',', $cols)->append($tail);
         return
             $this->_prepare($query->getQuery())->_execute($query->getArgs())
             ? $this->_sth->rowCount()
