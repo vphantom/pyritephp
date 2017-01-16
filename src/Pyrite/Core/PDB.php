@@ -459,7 +459,7 @@ class PDB
         $cols = array();
 
         if (!($tail instanceof PDBquery)) {
-            $tail = $db->query($tail, $tailArgs);
+            $tail = $this->query($tail, $tailArgs);
         };
 
         if (is_array($values)) {
