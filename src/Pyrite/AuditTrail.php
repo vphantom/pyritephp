@@ -202,32 +202,25 @@ class AuditTrail
             return array();
         };
 
-        $query = "SELECT *, datetime(timestamp, 'localtime') AS localtimestamp FROM transactions WHERE ";
-        $queryArgs = array();
-        $queryChunks = array();
+        $query = $db->query("SELECT *, datetime(timestamp, 'localtime') AS localtimestamp FROM transactions WHERE");
+        $conditions = array();
         foreach ($args as $key => $val) {
             if (is_array($val)) {
-                $chunk = '(';
                 $chunkAlts = array();
                 foreach ($val as $altVal) {
-                    $chunkAlts[] = "{$key}=?";
-                    $queryArgs[] = $altVal;
+                    $chunkAlts[] = $db->query("{$key}=?", $altVal);
                 };
-                $chunk .= implode(' OR ', $chunkAlts);
-                $chunk .= ')';
-                $queryChunks[] = $chunk;
+                $conditions[] = $db->query()->implodeClosed('OR', $chunkAlts);
             } else {
-                $queryChunks[] = "{$key}=?";
-                $queryArgs[] = $val;
+                $conditions[] = $db->query("{$key}=?", $val);
             };
         };
-        $query .= implode(' AND ', $queryChunks);
-        $query .= " ORDER BY id {$order}";
+        $query->implode('AND', $conditions)->order_by('id ' . $order);
         if ($max !== null) {
-            $query .= " LIMIT {$max}";
+            $query->limit($max);
         };
 
-        return $db->selectArray($query, $queryArgs);
+        return $db->selectArray($query);
     }
 
     /**

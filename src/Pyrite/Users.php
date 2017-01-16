@@ -324,20 +324,18 @@ class Users
     {
         global $PPHP;
         $db = $PPHP['db'];
-        $where = '';
-        $wheres = array();
-        $whereArgs = array();
+        $query = $db->query('SELECT id, email, name FROM users');
+        $conditions = array();
         if ($email !== null) {
-            $wheres[] =  'email LIKE ? ';
-            $whereArgs[] = '%' . $email . '%';
+            $conditions[] = $db->query('email LIKE ?', "%{$email}%");
         };
         if ($name !== null) {
-            $wheres[] = 'name LIKE ? ';
-            $whereArgs[] = '%' . $name . '%';
+            $conditions[] = $db->query('name LIKE ?', "%{$name}%");
         };
-        if ($email !== null  ||  $name !== null) {
-            $where = ' WHERE ' . implode(' AND ', $wheres) . ' ';
+        if (count($conditions) > 0) {
+            $query->append('WHERE')->implode('AND', $conditions);
         };
-        return $db->selectArray("SELECT id, email, name FROM users {$where} ORDER BY id DESC LIMIT 100", $whereArgs);
+        $query->order_by('id DESC')->limit(100);
+        return $db->selectArray($query);
     }
 }
