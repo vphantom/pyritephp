@@ -424,7 +424,6 @@ class PDB
             };
         };
         $query->implodeClosed(',', $cols)->append('VALUES')->implodeClosed(',', $colQs);
-        print_r($query);
         return
             $this->_prepare($query->getQuery())->_execute($query->getArgs())
             ? $this->_dbh->lastInsertId()
