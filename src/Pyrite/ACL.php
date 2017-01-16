@@ -38,6 +38,7 @@ class ACL
         on('install',     'Pyrite\ACL::install');
         on('newuser',     'Pyrite\ACL::reload');
         on('can',         'Pyrite\ACL::can');
+        on('can_sql',     'Pyrite\ACL::sqlCondition');
         on('grant',       'Pyrite\ACL::grant');
         on('revoke',      'Pyrite\ACL::revoke');
         on('user_roles',  'Pyrite\ACL::getRoles');
@@ -204,7 +205,6 @@ class ACL
         if (!isset($_SESSION['ACL_INFO'])) {
             return false;
         };
-
         $acl = $_SESSION['ACL_INFO'];
 
         if (array_key_exists('*', $acl)) {
@@ -224,6 +224,59 @@ class ACL
         };
 
         return false;
+    }
+
+    /**
+     * Get SQL condition for matching objectIds user has right to
+     *
+     * This behaves identically to can(), except it returns one of:
+     *
+     * When there is no right: "(1=2)"
+     * When a single Id is allowed: "{$columnName}=?"
+     * When multiple Ids are allowed: "{$columnName} IN (?, ...)"
+     * When every Id is allowed: "(1=1)"
+     *
+     * @param string $columnName Name of column to match Ids in your query
+     * @param string $action     Action to test
+     * @param string $objectType Class of object this applies to
+     *
+     * @return object PDBquery object
+     */
+    public static function sqlCondition($columnName, $action, $objectType = null)
+    {
+        global $PPHP;
+        $db = $PPHP['db'];
+        $sqlTRUE = '(1=1)';
+        $sqlFALSE = '(1=2)';
+
+        if (!isset($_SESSION['ACL_INFO'])) {
+            return $db->query($sqlFALSE);
+        };
+        $acl = $_SESSION['ACL_INFO'];
+
+        if (array_key_exists('*', $acl)) {
+            return $db->query($sqlTRUE);
+        };
+        if (array_key_exists($action, $acl)) {
+            $acl2 = $acl[$action];
+            if (array_key_exists('*', $acl2)) {
+                return $db->query($sqlTRUE);
+            };
+            if (array_key_exists($objectType, $acl2)) {
+                $acl3 = $acl2[$objectType];
+                if (in_array(0, $acl3)) {
+                    return $db->query($sqlTRUE);
+                } elseif (count($acl3) === 1) {
+                    return $db->query("{$columnName}=?", $acl3[0]);
+                } elseif (count($acl3) > 0) {
+                    return $db->query("{$columnName} IN")->varsClosed($acl3);
+                } else {
+                    return $db->query($sqlFALSE);
+                };
+            };
+        } else {
+            return $db->query($sqlFALSE);
+        };
     }
 
     /**
