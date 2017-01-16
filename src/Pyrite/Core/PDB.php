@@ -10,12 +10,200 @@
  * @category  Library
  * @package   PDB
  * @author    Stéphane Lavergne <lis@imars.com>
- * @copyright 2016 Stéphane Lavergne
+ * @copyright 2016-2017 Stéphane Lavergne
  * @license   https://opensource.org/licenses/MIT  MIT License
  * @link      https://github.com/vphantom/php-library
  */
 
 namespace Pyrite\Core;
+
+
+/**
+ * PDBquery class
+ *
+ * @category  Library
+ * @package   PDB
+ * @author    Stéphane Lavergne <lis@imars.com>
+ * @copyright 2016-2017 Stéphane Lavergne
+ * @license   https://opensource.org/licenses/MIT  MIT License
+ * @link      https://github.com/vphantom/php-library
+ */
+
+class PDBquery
+{
+    private $_query;
+    private $_args;
+
+    /**
+     * Constructor
+     *
+     * @param string $query (Optional) String portion of partial query
+     * @param array  $args  (Optional) List of arguments for placeholders
+     *
+     * @return object PDBquery object
+     */
+    public function __construct($query = null, $args = null)
+    {
+        $this->_query = ($query !== null ? $query : '');
+        $this->_args = array();
+        if (is_array($args)) {
+            foreach ($args as $arg) {
+                $this->_args[] = $arg;  // Faster than array_merge() which copies
+            };
+        } elseif ($args !== null) {
+            $this->_args[] = $args;
+        };
+    }
+
+    /**
+     * Get current query string
+     *
+     * @return string
+     */
+    public function getQuery()
+    {
+        return $this->_query;
+    }
+
+    /**
+     * Get current list of arguments
+     *
+     * @return array
+     */
+    public function getArgs()
+    {
+        return $this->_args;
+    }
+
+    /**
+     * Append to current query
+     *
+     * @param string|object $query String portion or other query
+     * @param array         $args  (Optional) List of arguments
+     *
+     * @return object PDBquery this same object, for chaining
+     */
+    public function append($query, $args = null)
+    {
+        if ($query instanceof PDBquery) {
+            $args = $query->getArgs();
+            $query = $query->getQuery();
+        };
+        $this->_query .= ' ' . $query;
+        if (is_array($args)) {
+            foreach ($args as $arg) {
+                $this->_args[] = $arg;  // Faster than array_merge() which copies
+            };
+        } elseif ($args !== null) {
+            $this->_args[] = $args;
+        };
+        return $this;
+    }
+
+    /**
+     * Append to query, with convenience keyword prepend
+     *
+     * Calling any unknown method appends the uppercased method's name to the
+     * query and wraps to append() with its arguments.  Underscores in the
+     * name are replaced with spaces, i.e. "order_by()" becomes "ORDER BY".
+     *
+     * Calling without any arguments is allowed.
+     *
+     * @param string $name   Per PHP docs, this is the method name
+     * @param array  $params Per PHP docs, this lists any supplied arguments
+     *
+     * @return object PDBquery this same object, for chaining
+     */
+    public function __call($name, $params)
+    {
+        $name = strtoupper($name);
+        $name = strtr($name, '_', ' ');
+        $this->_query .= ' ' . $name;
+        if (isset($params[0])) {
+            return $this->append($params[0], isset($params[1]) ? $params[1] : null);
+        };
+        return $this;
+    }
+
+    /**
+     * Append one/multiple straight values
+     *
+     * If there are multiple values in the array, they will be separated by
+     * commas.
+     *
+     * @param array $args List of values to append (with placeholders)
+     *
+     * @return object PDBquery this same object, for chaining
+     */
+    public function appendValues($args)
+    {
+        $this->_query .= implode(',', array_fill(0, count($args), '?'));
+        foreach ($args as $arg) {
+            $this->_args[] = $arg;
+        };
+        return $this;
+    }
+
+    /**
+     * Append multiple PDBquery objects
+     *
+     * @param string $glue    What to insert between joined queries
+     * @param array  $queries PDBquery objects or strings to join
+     *
+     * @return object PDBquery this same object, for chaining
+     */
+    public function appendJoin($glue, $queries)
+    {
+        $first = true;
+        foreach ($queries as $query) {
+            if ($first) {
+                $first = false;
+            } else {
+                $this->_query .= ' ' . $glue;
+            };
+            $this->append($query);
+        };
+        return $this;
+    }
+
+    /**
+     * Append one/multiple straight values, wrapped in parenthesis
+     *
+     * This is identical to appendValues() except '(' and ')' are wrapped
+     * around the insertion.
+     *
+     * @param array $args List of values to append (with placeholders)
+     *
+     * @return object PDBquery this same object, for chaining
+     */
+    public function appendValuesClosed($args)
+    {
+        $this->_query .= ' (';
+        $this->appendValues($args);
+        $this->_query .= ' )';
+        return $this;
+    }
+
+    /**
+     * Append multiple PDBquery objects, wrapped in parenthesis
+     *
+     * This is identical to appendJoin() except '(' and ')' are wrapped around
+     * the insertion.
+     *
+     * @param string $glue    What to insert between joined queries
+     * @param array  $queries PDBquery objects or strings to join
+     *
+     * @return object PDBquery this same object, for chaining
+     */
+    public function appendJoinClosed($glue, $queries)
+    {
+        $this->_query .= ' (';
+        $this->appendJoin($glue, $queries);
+        $this->_query .= ' )';
+        return $this;
+    }
+}
+
 
 /**
  * PDB class
@@ -23,7 +211,7 @@ namespace Pyrite\Core;
  * @category  Library
  * @package   PDB
  * @author    Stéphane Lavergne <lis@imars.com>
- * @copyright 2016 Stéphane Lavergne
+ * @copyright 2016-2017 Stéphane Lavergne
  * @license   https://opensource.org/licenses/MIT  MIT License
  * @link      https://github.com/vphantom/php-library
  */
@@ -42,7 +230,7 @@ class PDB
      * @param string $user (Optional) Username for database
      * @param string $pass (Optional) Password for database
      *
-     * @return object PDB instance
+     * @return object PDB object
      */
     public function __construct($dsn, $user = null, $pass = null)
     {
@@ -53,9 +241,22 @@ class PDB
     }
 
     /**
+     * Convenience constructor for PDBquery objects
+     *
+     * @param string $query String portion of partial query
+     * @param array  $args  (Optional) List of arguments for placeholders
+     *
+     * @return object PDBquery object
+     */
+    public function query($query, $args)
+    {
+        return new PDBquery($query, $args);
+    }
+
+    /**
      * Begin transaction
      *
-     * @return object PDB instance (for chaining)
+     * @return object PDB object (for chaining)
      */
     public function begin()
     {
@@ -66,7 +267,7 @@ class PDB
     /**
      * Commit pending transaction
      *
-     * @return object PDB instance (for chaining)
+     * @return object PDB object (for chaining)
      */
     public function commit()
     {
@@ -77,7 +278,7 @@ class PDB
     /**
      * Rollback pending transaction
      *
-     * @return object PDB instance (for chaining)
+     * @return object PDB object (for chaining)
      */
     public function rollback()
     {
@@ -117,7 +318,7 @@ class PDB
      *
      * @param string $q SQL query with '?' value placeholders
      *
-     * @return object PDB instance (for chaining)
+     * @return object PDB object (for chaining)
      */
     private function _prepare($q)
     {
@@ -158,13 +359,17 @@ class PDB
      *
      * Typically INSERT, UPDATE, DELETE.
      *
-     * @param string $q    SQL query with '?' value placeholders
-     * @param array  $args (Optional) List of values corresponding to placeholders
+     * @param string|object $q    SQL query with '?' placeholders or PDBquery object
+     * @param array         $args (Optional) List of values corresponding to placeholders
      *
      * @return mixed Number of affected rows, false on error
      */
     public function exec($q, $args = array())
     {
+        if ($q instanceof PDBquery) {
+            $args = $q->getArgs();
+            $q = $q->getQuery();
+        };
         return $this->_prepare($q)->_execute($args) ? $this->_sth->rowCount() : false;
     }
 
@@ -207,22 +412,20 @@ class PDB
     public function insert($table, $values)
     {
         $colOK = $this->_getColumns($table);
-        $query = 'INSERT INTO ' . $table . ' (';
-        $queryArgs = array();
+        $query = $this->query('INSERT INTO ' . $table);
         $colQs = array();
         $cols = array();
         if (is_array($values)) {
             foreach ($values as $key => $val) {
                 if (in_array($key, $colOK)) {
                     $cols[] = $key;
-                    $colQs[] = '?';
-                    $queryArgs[] = $val;
+                    $colQs[] = $this->query('?', $val);
                 };
             };
         };
-        $query .= implode(', ', $cols) . ') VALUES (' . implode(', ', $colQs) . ')';
+        $query->appendJoinClosed(',', $cols)->append('VALUES')->appendJoinClosed(',', $colQs);
         return
-            $this->_prepare($query)->_execute($queryArgs)
+            $this->_prepare($query->getQuery())->_execute($query->getArgs())
             ? $this->_dbh->lastInsertId()
             : false
         ;
@@ -239,33 +442,37 @@ class PDB
      * Also, note that if you want to append custom column assignments, it is
      * up to you to prepend ", " to $tail before your WHERE clause.
      *
-     * @param string $table    Name of table to update
-     * @param array  $values   Associative list of columns/values to set
-     * @param string $tail     Final part of SQL query (i.e. custom columns, WHERE clause)
-     * @param array  $tailArgs (Optional) List of values corresponding to placeholders in $tail
+     * $tail can be a string (in which case $tailArgs specifies any arguments)
+     * or a PDBquery object.
+     *
+     * @param string        $table    Name of table to update
+     * @param array         $values   Associative list of columns/values to set
+     * @param string|object $tail     Final part of SQL query (i.e. custom columns, WHERE clause)
+     * @param array         $tailArgs (Optional) List of values corresponding to placeholders in $tail
      *
      * @return mixed Last ID if supported/available, false on failure
      */
     public function update($table, $values, $tail, $tailArgs = array())
     {
         $colOK = $this->_getColumns($table);
-        $query = 'UPDATE ' . $table . ' SET ';
-        $queryArgs = array();
+        $query = $this->query('UPDATE ' . $table . ' SET');
         $cols = array();
+
+        if (!($tail instanceof PDBquery)) {
+            $tail = $db->query($tail, $tailArgs);
+        };
+
         if (is_array($values)) {
             foreach ($values as $key => $val) {
                 if (in_array($key, $colOK)) {
-                    $cols[] = "{$key}=?";
-                    $queryArgs[] = $val;
+                    // FIXME: $val needs to be an array right now?
+                    $cols[] = $this->query("{$key}=?", $val);
                 };
             };
         };
-        $query .= implode(', ', $cols) . ' ' . $tail;
-        foreach ($tailArgs as $arg) {
-            $queryArgs[] = $arg;  // Faster than array_merge(), which copies
-        };
+        $query->appendJoin(',', $cols)->append($tail);
         return
-            $this->_prepare($query)->_execute($queryArgs)
+            $this->_prepare($query->getQuery())->_execute($query->getArgs())
             ? $this->_sth->rowCount()
             : false
         ;
