@@ -35,15 +35,17 @@ class ACL
      */
     public static function bootstrap()
     {
-        on('install',     'Pyrite\ACL::install');
-        on('newuser',     'Pyrite\ACL::reload');
-        on('can',         'Pyrite\ACL::can');
-        on('can_sql',     'Pyrite\ACL::sqlCondition');
-        on('grant',       'Pyrite\ACL::grant');
-        on('revoke',      'Pyrite\ACL::revoke');
-        on('user_roles',  'Pyrite\ACL::getRoles');
-        on('user_rights', 'Pyrite\ACL::getUserACL');
-        on('role_rights', 'Pyrite\ACL::getRoleACL');
+        on('install',      'Pyrite\ACL::install');
+        on('newuser',      'Pyrite\ACL::reload');
+        on('can',          'Pyrite\ACL::can');
+        on('can_sql',      'Pyrite\ACL::sqlCondition');
+        on('grant',        'Pyrite\ACL::grant');
+        on('revoke',       'Pyrite\ACL::revoke');
+        on('user_roles',   'Pyrite\ACL::getRoles');
+        on('user_rights',  'Pyrite\ACL::getUserACL');
+        on('role_rights',  'Pyrite\ACL::getRoleACL');
+        on('role_users',   'Pyrite\ACL::getRoleUsers');
+        on('object_users', 'Pyrite\ACL::getObjectUsers');
     }
 
     /**
@@ -472,5 +474,55 @@ class ACL
             array($userId)
         );
         return is_array($flat) ? $flat : array();
+    }
+
+    /**
+     * List users which have a given role
+     *
+     * @param string $role Role to get users for
+     *
+     * @return array List of userIds
+     */
+    public static function getRoleUsers($role)
+    {
+        global $PPHP;
+        $db = $PPHP['db'];
+
+        return $db->selectList(
+            "
+            SELECT userId FROM users_roles
+            WHERE role=?
+            ORDER BY userId ASC
+            ",
+            array($role)
+        );
+    }
+
+    /**
+     * List users which have a specific right
+     *
+     * @param string $action     Action
+     * @param string $objectType Object class
+     * @param int    $objectId   Object ID
+     *
+     * @return array List of userIds
+     */
+    public static function getObjectUsers($action, $objectType, $objectId)
+    {
+        global $PPHP;
+        $db = $PPHP['db'];
+
+        return $db->selectList(
+            "
+            SELECT userId FROM acl_users
+            WHERE action=? AND objectType=? AND objectId=?
+            ORDER BY userId ASC
+            ",
+            array(
+                $action,
+                $objectType,
+                $objectId
+            )
+        );
     }
 }
