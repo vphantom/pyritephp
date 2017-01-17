@@ -80,14 +80,14 @@ class Templating
         };
 
         $twigLoader->addPath($tplBase);
-        $twig = new \Twig_Environment(
-            $twigLoader,
-            array(
-                // 'cache' => __DIR__ . '/var/twig_cache',
-                'autoescape' => true,
-                'debug' => $PPHP['config']['global']['debug']
-            )
+        $twigConfig = array(
+            'autoescape' => true,
+            'debug' => $PPHP['config']['global']['debug']
         );
+        if ($PPHP['config']['global']['production'] === true) {
+            $twigConfig['cache'] = __DIR__ . '/var/twig_cache';
+        };
+        $twig = new \Twig_Environment($twigLoader, $twigConfig);
         $twig->addFunction(
             new \Twig_SimpleFunction(
                 'grab', function () {
