@@ -207,18 +207,16 @@ class ACL
         };
         $acl = $_SESSION['ACL_INFO'];
 
-        if (array_key_exists('*', $acl)) {
-            return true;
-        };
-        if (array_key_exists($action, $acl)) {
-            $acl2 = $acl[$action];
-            if (array_key_exists('*', $acl2)) {
-                return true;
-            };
-            if (array_key_exists($objectType, $acl2)) {
-                $acl3 = $acl2[$objectType];
-                if (in_array(0, $acl3) || in_array($objectId, $acl3)) {
-                    return true;
+        foreach (array('*', $action) as $act) {
+            if (array_key_exists($act, $acl)) {
+                $acl2 = $acl[$act];
+                foreach (array('*', $objectType) as $typ) {
+                    if (array_key_exists($typ, $acl2)) {
+                        $acl3 = $acl2[$typ];
+                        if (in_array(0, $acl3) || in_array($objectId, $acl3)) {
+                            return true;
+                        };
+                    };
                 };
             };
         };
@@ -254,29 +252,25 @@ class ACL
         };
         $acl = $_SESSION['ACL_INFO'];
 
-        if (array_key_exists('*', $acl)) {
-            return $db->query($sqlTRUE);
-        };
-        if (array_key_exists($action, $acl)) {
-            $acl2 = $acl[$action];
-            if (array_key_exists('*', $acl2)) {
-                return $db->query($sqlTRUE);
-            };
-            if (array_key_exists($objectType, $acl2)) {
-                $acl3 = $acl2[$objectType];
-                if (in_array(0, $acl3)) {
-                    return $db->query($sqlTRUE);
-                } elseif (count($acl3) === 1) {
-                    return $db->query("{$columnName}=?", $acl3[0]);
-                } elseif (count($acl3) > 0) {
-                    return $db->query("{$columnName} IN")->varsClosed($acl3);
-                } else {
-                    return $db->query($sqlFALSE);
+        $granted = array();
+        foreach (array('*', $action) as $act) {
+            if (array_key_exists($act, $acl)) {
+                $acl2 = $acl[$act];
+                foreach (array('*', $objectType) as $typ) {
+                    if (array_key_exists($typ, $acl2)) {
+                        $granted = array_merge($granted, $acl2[$typ]);
+                    };
                 };
             };
-        } else {
-            return $db->query($sqlFALSE);
         };
+        if (in_array(0, $granted)) {
+            return $db->query($sqlTRUE);
+        } elseif (count($granted) === 1) {
+            return $db->query("{$columnName}=?", $granted[0]);
+        } elseif (count($granted) > 0) {
+            return $db->query("{$columnName} IN")->varsClosed($granted);
+        };
+        return $db->query($sqlFALSE);
     }
 
     /**
