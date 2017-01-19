@@ -39,6 +39,7 @@ class ACL
         on('newuser',      'Pyrite\ACL::reload');
         on('can',          'Pyrite\ACL::can');
         on('can_sql',      'Pyrite\ACL::sqlCondition');
+        on('has_role',     'Pyrite\ACL::hasRole');
         on('grant',        'Pyrite\ACL::grant');
         on('revoke',       'Pyrite\ACL::revoke');
         on('user_roles',   'Pyrite\ACL::getRoles');
@@ -185,6 +186,23 @@ class ACL
             array($userId)
         );
         self::_load($flat);
+
+        $_SESSION['user']['roles'] = self::getRoles($userId);
+    }
+
+    /**
+     * Tests whether current user is a member of specified role
+     *
+     * @param string $role Role to test
+     *
+     * @return bool Whether the user has that role
+     */
+    public static function hasRole($role)
+    {
+        if (!array_key_exists('roles', $_SESSION['user'])) {
+            return false;
+        };
+        return in_array($role, $_SESSION['user']['roles']);
     }
 
     /**
