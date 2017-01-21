@@ -157,13 +157,13 @@ class Templating
         self::$_twig = $twig;
 
         $req = grab('request');
+        if (self::$_status !== 200) {
+            http_response_code(self::$_status);
+        };
         if (!$req['binary']) {
             try {
                 self::$_template = $twig->loadTemplate('layout.html');
 
-                if (self::$_status !== 200) {
-                    http_response_code(self::$_status);
-                };
                 self::$_template->displayBlock(
                     'head',
                     array(
