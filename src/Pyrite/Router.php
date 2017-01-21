@@ -107,7 +107,7 @@ class Router
 
         // Eat up initial directories as long as they contain request flags
         self::$_req['binary'] = false;
-        while (self::$_PATH[0][0] === '=') {
+        while (count(self::$_PATH) > 0 && self::$_PATH[0][0] === '=') {
             $flag = strtolower(array_shift(self::$_PATH));
             if ($flag === '=bin') {
                 self::$_req['binary'] = true;
