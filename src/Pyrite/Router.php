@@ -105,6 +105,15 @@ class Router
         self::$_req['default_lang'] = $PPHP['config']['global']['default_lang'];
         self::$_req['base'] = ($lang === $PPHP['config']['global']['default_lang'] ? '' : "/{$lang}");
 
+        // Eat up initial directories as long as they contain request flags
+        self::$_req['binary'] = false;
+        while (self::$_PATH[0][0] === '=') {
+            $flag = strtolower(array_shift(self::$_PATH));
+            if ($flag === '=bin') {
+                self::$_req['binary'] = true;
+            };
+        };
+
         self::$_req['path'] = implode('/', self::$_PATH);
         self::$_req['query'] = (isset($parsedURL['query']) ? '?' . $parsedURL['query'] : '');
         self::$_req['host'] = $_SERVER['HTTP_HOST'];

@@ -156,25 +156,28 @@ class Templating
 
         self::$_twig = $twig;
 
-        try {
-            self::$_template = $twig->loadTemplate('layout.html');
+        $req = grab('request');
+        if (!$req['binary']) {
+            try {
+                self::$_template = $twig->loadTemplate('layout.html');
 
-            if (self::$_status !== 200) {
-                http_response_code(self::$_status);
+                if (self::$_status !== 200) {
+                    http_response_code(self::$_status);
+                };
+                self::$_template->displayBlock(
+                    'head',
+                    array(
+                        'config' => $PPHP['config'],
+                        'session' => $_SESSION,
+                        'req' => $req
+                    )
+                );
+            } catch (\Exception $e) {
+                echo $e->getMessage();
             };
-            self::$_template->displayBlock(
-                'head',
-                array(
-                    'config' => $PPHP['config'],
-                    'session' => $_SESSION,
-                    'req' => grab('request')
-                )
-            );
-        } catch (\Exception $e) {
-            echo $e->getMessage();
+            flush();
+            ob_start();
         };
-        flush();
-        ob_start();
     }
 
     /**
@@ -185,23 +188,26 @@ class Templating
     public static function shutdown()
     {
         global $PPHP;
+        $req = grab('request');
 
-        $body = ob_get_contents();
-        ob_end_clean();
-        try {
-            self::$_template->displayBlock(
-                'body',
-                array(
-                    'title' => self::$_title,
-                    'body' => self::$_safeBody,
-                    'stdout' => $body,
-                    'config' => $PPHP['config'],
-                    'session' => $_SESSION,
-                    'req' => grab('request')
-                )
-            );
-        } catch (\Exception $e) {
-            echo $e->getMessage();
+        if (!$req['binary']) {
+            $body = ob_get_contents();
+            ob_end_clean();
+            try {
+                self::$_template->displayBlock(
+                    'body',
+                    array(
+                        'title' => self::$_title,
+                        'body' => self::$_safeBody,
+                        'stdout' => $body,
+                        'config' => $PPHP['config'],
+                        'session' => $_SESSION,
+                        'req' => grab('request')
+                    )
+                );
+            } catch (\Exception $e) {
+                echo $e->getMessage();
+            };
         };
     }
 
