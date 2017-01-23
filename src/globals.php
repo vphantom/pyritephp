@@ -506,8 +506,7 @@ on(
                 $history = grab(
                     'history',
                     array(
-                        'objectType' => 'user',
-                        'objectId' => $_GET['id'],
+                        'userId' => $_GET['id'],
                         'order' => 'DESC',
                         'max' => 20
                     )
