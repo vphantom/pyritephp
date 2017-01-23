@@ -179,6 +179,8 @@ class Users
                 if ($user['onetimeElapsed'] < $onetimeMax  &&  password_verify($onetime, $user['onetimeHash'])) {
                     // Invalidate immediately, don't wait for expiration
                     $db->update('users', array('onetimeHash' => '*'), 'WHERE id=?', array($user['id']));
+                    // Make sure user has role 'member' now that a onetime worked
+                    pass('grant', $user['id'], 'member');
                     return $user;
                 };
             } else {
@@ -287,10 +289,6 @@ class Users
         };
         if (($result = $db->insert('users', $cols)) !== false) {
             $creator = $result;
-
-            // Newly created users must be allowed to log in
-            pass('grant', $result, 'member');
-
             if (isset($_SESSION['user']) && is_array($_SESSION['user'])) {
                 $creator = $_SESSION['user']['id'];
             };
