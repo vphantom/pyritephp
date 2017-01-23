@@ -468,7 +468,7 @@ on(
     function ($path) {
         global $PPHP;
 
-        if (!pass('can', 'view', 'user')) return trigger('http_status', 403);
+        if (!(pass('can', 'view', 'user') || pass('can', 'create', 'user'))) return trigger('http_status', 403);
 
         $f = array_shift($path);
         switch ($f) {
