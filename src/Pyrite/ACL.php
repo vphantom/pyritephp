@@ -450,7 +450,7 @@ class ACL
     {
         global $PPHP;
         $db = $PPHP['db'];
-        $roles = $db->selectList("SELECT role FROM users_roles WHERE userId=?", array($userId));
+        $roles = $db->selectList("SELECT role FROM users_roles WHERE userId=? ORDER BY role ASC", array($userId));
         return $roles !== false ? $roles : array();
     }
 
