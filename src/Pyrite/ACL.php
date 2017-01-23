@@ -353,6 +353,12 @@ class ACL
             );
         };
 
+        if (($userId !== null && $_SESSION['user']['id'] == $userId)
+            || ($role !== null && self::hasRole($role))
+        ) {
+            self::reload();
+        };
+
         return false;
     }
 
@@ -422,6 +428,12 @@ class ACL
                     $objectId
                 )
             );
+        };
+
+        if (($userId !== null && $_SESSION['user']['id'] == $userId)
+            || ($role !== null && self::hasRole($role))
+        ) {
+            self::reload();
         };
 
         return false;
