@@ -480,7 +480,6 @@ on(
             $success = false;
             $history = array();
             $user = array();
-            $roles = array();
             $rights = array();
 
             if (!pass('can', 'edit', 'user')) return trigger('http_status', 403);

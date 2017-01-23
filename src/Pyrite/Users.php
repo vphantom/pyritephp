@@ -180,7 +180,7 @@ class Users
                     // Invalidate immediately, don't wait for expiration
                     $db->update('users', array('onetimeHash' => '*'), 'WHERE id=?', array($user['id']));
                     // Make sure user has role 'member' now that a onetime worked
-                    pass('grant', $user['id'], 'member');
+                    trigger('grant', $user['id'], 'member');
                     return $user;
                 };
             } else {
@@ -301,6 +301,11 @@ class Users
                     'action'     => 'created'
                 )
             );
+            // If we're creating someone else's account, automatic approval of the e-mail address
+            if (pass('can', 'create', 'user')) {
+                trigger('grant', $result, 'member');
+            };
+
         };
         return ($result && $onetime !== null) ? $onetime : $result;
     }
