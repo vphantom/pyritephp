@@ -83,6 +83,7 @@ class Pyrite
 
         // Database
         $PPHP['db'] = new Pyrite\Core\PDB($PPHP['config']['db']['type'] . ':' . $PPHP['dir'] . '/' . $PPHP['config']['db']['sqlite_path']);
+        $PPHP['db']->exec("PRAGMA foreign_keys = ON");
 
         // Load local install's modules
         foreach (glob($PPHP['dir'] . '/modules/*.php') as $fname) {
