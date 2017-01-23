@@ -579,10 +579,13 @@ on(
 
 on(
     'route/admin+roles',
-    function () {
+    function ($path) {
         global $PPHP;
 
         if (!pass('can', 'view', 'role')) return trigger('http_status', 403);
+
+        $roleId = array_shift($path);
+        if ($roleId === null) $roleId = 'admin';
 
         $f = isset($_POST['f']) ? $_POST['f'] : null;
         $success = false;
@@ -594,22 +597,17 @@ on(
             if (!pass('can', 'edit', 'role')) return trigger('http_status', 403);
 
             $added = true;
-            $success = pass('grant', null, $_POST['role'], $_POST['action'], $_POST['objectType'], $_POST['objectId']);
+            $success = pass('grant', null, $roleId, $_POST['action'], $_POST['objectType'], $_POST['objectId']);
             break;
 
         case 'del':
             if (!pass('can', 'edit', 'role')) return trigger('http_status', 403);
 
             $deleted = true;
-            $success = pass('revoke', null, $_POST['role'], $_POST['action'], $_POST['objectType'], $_POST['objectId']);
+            $success = pass('revoke', null, $roleId, $_POST['action'], $_POST['objectType'], $_POST['objectId']);
             break;
 
         default:
-        };
-
-        $roles = array();
-        foreach ($PPHP['config']['acl']['roles'] as $role) {
-            $roles[$role] = grab('role_rights', $role);
         };
 
         trigger(
@@ -618,7 +616,9 @@ on(
             array(
                 'actions'     => $PPHP['config']['acl']['actions'],
                 'objectTypes' => $PPHP['config']['acl']['objectTypes'],
-                'roles'       => $roles,
+                'role'        => $roleId,
+                'roles'       => $PPHP['config']['acl']['roles'],
+                'rights'      => grab('role_rights', $roleId),
                 'success'     => $success,
                 'added'       => $added,
                 'deleted'     => $deleted
