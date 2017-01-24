@@ -164,7 +164,7 @@ class AuditTrail
      * You can either use these positional arguments or specify a single
      * associative array argument with only the keys you need defined.
      *
-     * @param array|int|null  $userId     Specific actor (*or args, see above)
+     * @param array|int|null  $userId     Specific actor OR object (*or args, see above)
      * @param string|null     $objectType Class of object this applies to
      * @param string|int|null $objectId   Specific instance acted upon
      * @param string|null     $action     Type of action performed
@@ -212,7 +212,14 @@ class AuditTrail
                 };
                 $conditions[] = $db->query()->implodeClosed('OR', $chunkAlts);
             } else {
-                $conditions[] = $db->query("{$key}=?", $val);
+                if ($key === 'userId') {
+                    $chunkAlts = array();
+                    $chunkAlts[] = $db->query('userId=?', $val);
+                    $chunkAlts[] = $db->query("(objectType='user' AND objectId=?)", $val);
+                    $conditions[] = $db->query()->implodeClosed('OR', $chunkAlts);
+                } else {
+                    $conditions[] = $db->query("{$key}=?", $val);
+                };
             };
         };
         $query->implode('AND', $conditions)->order_by('id ' . $order);

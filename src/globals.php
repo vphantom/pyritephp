@@ -528,10 +528,12 @@ on(
                     $saved = true;
                     $user['active'] = 1;
                     $success = pass('unban_user', $_GET['id']);
+                    trigger('log', 'user', $_GET['id'], 'activated');
                 } elseif (isset($_POST['ban'])) {
                     $saved = true;
                     $user['active'] = 0;
                     $success = pass('ban_user', $_GET['id']);
+                    trigger('log', 'user', $_GET['id'], 'deactivated');
                 };
 
                 $history = grab(
