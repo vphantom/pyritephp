@@ -44,6 +44,8 @@ class Users
         on('user_update',    'Pyrite\Users::update');
         on('user_create',    'Pyrite\Users::create');
         on('user_search',    'Pyrite\Users::search');
+        on('ban_user',       'Pyrite\Users::ban');
+        on('unban_user',     'Pyrite\Users::unban');
     }
 
     /**
@@ -69,6 +71,7 @@ class Users
             CREATE TABLE IF NOT EXISTS 'users' (
                 id           INTEGER PRIMARY KEY AUTOINCREMENT,
                 email        VARCHAR(255) NOT NULL DEFAULT '',
+                active       BOOL NOT NULL DEFAULT '1',
                 passwordHash VARCHAR(255) NOT NULL DEFAULT '*',
                 onetimeHash  VARCHAR(255) NOT NULL DEFAULT '*',
                 onetimeTime  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -116,8 +119,8 @@ class Users
     /**
      * Resolve a user ID to basic information
      *
-     * Only id, name and email are included in this cached subset.  Useful for
-     * display purposes.
+     * Only id, active, name and email are included in this cached subset.
+     * Useful for display purposes.
      *
      * @param int $id User ID to resolve
      *
@@ -132,7 +135,7 @@ class Users
         };
 
         $db = $PPHP['db'];
-        if ($user = $db->selectSingleArray("SELECT id, name, email FROM users WHERE id=?", array($id))) {
+        if ($user = $db->selectSingleArray("SELECT id, active, name, email FROM users WHERE id=?", array($id))) {
             return self::$_resolved[$id] = $user;
         };
         return false;
@@ -141,15 +144,17 @@ class Users
     /**
      * Load a user by e-mail
      *
-     * @param string $email E-mail address
+     * @param string $email  E-mail address
+     * @param bool   $active (Optional) Require user be active, default true
      *
      * @return array|bool Associative array for the user or false if not found
      */
-    public static function fromEmail($email)
+    public static function fromEmail($email, $active = true)
     {
         global $PPHP;
         $db = $PPHP['db'];
-        if ($user = $db->selectSingleArray(self::$_selectFrom . " WHERE email=?", array($email))) {
+        $isActive = ($active ? ' AND active ' : '');
+        if ($user = $db->selectSingleArray(self::$_selectFrom . " WHERE email=? {$isActive}", array($email))) {
             return $user;
         };
         return false;
@@ -313,8 +318,9 @@ class Users
     /**
      * Search directory of users
      *
-     * For each matching user, each row returned is limited to id, email and
-     * name.  Specifying neither option is valid and returns all users.
+     * For each matching user, each row returned is limited to id, active,
+     * email and name.  Specifying neither option is valid and returns all
+     * users.
      *
      * No more than 100 users will be returned.
      *
@@ -327,7 +333,7 @@ class Users
     {
         global $PPHP;
         $db = $PPHP['db'];
-        $query = $db->query('SELECT id, email, name FROM users');
+        $query = $db->query('SELECT id, email, active, name FROM users');
         $conditions = array();
         if ($email !== null) {
             $conditions[] = $db->query('email LIKE ?', "%{$email}%");
@@ -337,8 +343,39 @@ class Users
         };
         if (count($conditions) > 0) {
             $query->append('WHERE')->implode('AND', $conditions);
+        } else {
+            $query->where('active');
         };
         $query->order_by('id DESC')->limit(100);
         return $db->selectArray($query);
+    }
+
+    /**
+     * Ban user by turning off its active flag
+     *
+     * @param int $id User ID
+     *
+     * @return bool Success of the underlying operation
+     */
+    public static function ban($id)
+    {
+        global $PPHP;
+        $db = $PPHP['db'];
+        $res = $db->exec("UPDATE users SET active='0' WHERE id=?", array($id));
+        return $res;
+    }
+
+    /**
+     * Unban user by turning on its active flag
+     *
+     * @param int $id User ID
+     *
+     * @return bool Success of the underlying operation
+     */
+    public static function unban($id)
+    {
+        global $PPHP;
+        $db = $PPHP['db'];
+        return $db->exec("UPDATE users SET active='1' WHERE id=?", array($id));
     }
 }

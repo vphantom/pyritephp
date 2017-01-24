@@ -47,6 +47,8 @@ class ACL
         on('role_rights',  'Pyrite\ACL::getRoleACL');
         on('role_users',   'Pyrite\ACL::getRoleUsers');
         on('object_users', 'Pyrite\ACL::getObjectUsers');
+        on('ban_user',     'Pyrite\ACL::banUser');
+        on('unban_user',   'Pyrite\ACL::unbanUser');
     }
 
     /**
@@ -554,5 +556,36 @@ class ACL
                 $objectId
             )
         );
+    }
+
+    /**
+     * When a user is banned, remove it from all ACL tables
+     *
+     * @param int $id User ID
+     *
+     * @return bool Success of the underlying operations
+     */
+    public static function banUser($id)
+    {
+        global $PPHP;
+        $db = $PPHP['db'];
+        $db->exec("DELETE FROM acl_users WHERE userId=?", array($id));
+        $db->exec("DELETE FROM users_roles WHERE userId=?", array($id));
+        return true;
+    }
+
+    /**
+     * When a user is unbanned, add it to member group
+     *
+     * @param int $id User ID
+     *
+     * @return bool Success of the underlying operations
+     */
+    public static function unbanUser($id)
+    {
+        global $PPHP;
+        $db = $PPHP['db'];
+        trigger('grant', $id, 'member');
+        return true;
     }
 }

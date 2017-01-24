@@ -488,28 +488,18 @@ on(
                 if (!pass('form_validate', 'user_prefs')) return trigger('http_status', 440);
                 $saved = true;
                 $success = pass('user_update', $_GET['id'], $_POST);
+            };
 
-            } elseif (isset($_GET['id'])) {
+            if (isset($_GET['id'])) {
                 $user = \Pyrite\Users::resolve($_GET['id']);
                 if (!$user) {
-                    // How do we say the ID is invalid?
-                    return;
+                    return trigger('http_status', 404);
                 };
 
-                $user = \Pyrite\Users::fromEmail($user['email']);
+                $user = \Pyrite\Users::fromEmail($user['email'], false);
                 if (!$user) {
-                    // Same thing...
-                    return;
+                    return trigger('http_status', 404);
                 };
-
-                $history = grab(
-                    'history',
-                    array(
-                        'userId' => $_GET['id'],
-                        'order' => 'DESC',
-                        'max' => 20
-                    )
-                );
 
                 if (isset($_POST['f'])) {
                     switch ($_POST['f']) {
@@ -534,8 +524,24 @@ on(
                 } elseif (isset($_POST['delrole'])) {
                     $deleted = true;
                     $success = pass('revoke', $_GET['id'], $_POST['delrole']);
+                } elseif (isset($_POST['unban'])) {
+                    $saved = true;
+                    $user['active'] = 1;
+                    $success = pass('unban_user', $_GET['id']);
+                } elseif (isset($_POST['ban'])) {
+                    $saved = true;
+                    $user['active'] = 0;
+                    $success = pass('ban_user', $_GET['id']);
                 };
 
+                $history = grab(
+                    'history',
+                    array(
+                        'userId' => $_GET['id'],
+                        'order' => 'DESC',
+                        'max' => 20
+                    )
+                );
                 $rights = grab('user_rights', $_GET['id']);
                 $roles = grab('user_roles', $_GET['id']);
             };
