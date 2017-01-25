@@ -130,7 +130,12 @@ class Pyrite
     /**
      * Sanitize file name
      *
-     * This is for base file names: slashes and dots are filtered out.
+     * This is for base file names: even dots are filtered out.
+     *
+     * Spaces are reduced and translated into underscores.
+     *
+     * CAVEAT: does not allow accented characters, commas, and anything else
+     * beyond alphanumeric, underscore and hyphen characters.
      *
      * @param string $name String to filter
      *
@@ -138,7 +143,7 @@ class Pyrite
      */
     function cleanFilename($name)
     {
-        return preg_replace('/[^a-zA-Z0-9_-]/', '', $name);
+        return preg_replace('/[^a-zA-Z0-9_-]/', '', preg_replace('/\s+/', '_', $name));
     }
 
     /**

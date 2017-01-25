@@ -132,6 +132,22 @@ class Router
         self::$_req['get'] = $_GET;
         self::$_req['post'] = $_POST;
 
+        // Process file uploads
+        self::$_req['files'] = array();
+        if (isset($_FILES) && count($_FILES) > 0) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            foreach ($_FILES as $key => $info) {
+                if (is_uploaded_file($info['tmp_name'])) {
+                    self::$_req['files'][$key] = $info;
+                    // Overwrite client's MIME Type with server's determination
+                    self::$_req['files'][$key]['type'] = finfo_file($finfo, $info['tmp_name']);
+                    foreach (pathinfo($info['name']) as $pik => $piv) {
+                        self::$_req['files'][$key][$pik] = $piv;
+                    };
+                };
+            };
+            finfo_close($finfo);
+        };
     }
 
     /**
