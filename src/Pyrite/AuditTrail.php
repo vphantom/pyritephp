@@ -96,10 +96,11 @@ class AuditTrail
      * @param string|int|null $oldValue   Previous value for affected field
      * @param string|int|null $newValue   New value for affected field
      * @param string|int|null $userId     Over-ride session userId with this one
+     * @param string|null     $content    Additional text to store in the entry
      *
      * @return null
      */
-    public static function add($objectType, $objectId = null, $action = null, $fieldName = null, $oldValue = null, $newValue = null, $userId = 0)
+    public static function add($objectType, $objectId = null, $action = null, $fieldName = null, $oldValue = null, $newValue = null, $userId = 0, $content = '')
     {
         global $PPHP;
         $db = $PPHP['db'];
@@ -118,6 +119,7 @@ class AuditTrail
             if (isset($objectType['oldValue']))  $oldValue  = $objectType['oldValue'];
             if (isset($objectType['newValue']))  $newValue  = $objectType['newValue'];
             if (isset($objectType['userId']))    $userId    = $objectType['userId'];
+            if (isset($objectType['content']))   $content   = $objectType['content'];
             if (isset($objectType['objectType'])) {
                 $objectType = $objectType['objectType'];
             } else {
@@ -132,8 +134,8 @@ class AuditTrail
         $db->exec(
             "
             INSERT INTO transactions
-            (userId, ip, objectType, objectId, action, fieldName, oldValue, newValue)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (userId, ip, objectType, objectId, action, fieldName, oldValue, newValue, content)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ",
             array(
                 $userId,
@@ -143,7 +145,8 @@ class AuditTrail
                 $action,
                 $fieldName,
                 $oldValue,
-                $newValue
+                $newValue,
+                $content
             )
         );
     }
