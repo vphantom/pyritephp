@@ -321,12 +321,13 @@ class ACL
     {
         global $PPHP;
         $db = $PPHP['db'];
+        $success = false;
 
         if ($objectId === '') {
             $objectId = 0;
         };
         if ($userId !== null  &&  $role !== null) {
-            return $db->insert(
+            $success = $db->insert(
                 'users_roles',
                 array(
                     'userId' => $userId,
@@ -334,7 +335,7 @@ class ACL
                 )
             );
         } elseif ($userId !== null  &&  $action !== null) {
-            return $db->insert(
+            $success = $db->insert(
                 'acl_users',
                 array(
                     'userId'     => $userId,
@@ -344,7 +345,7 @@ class ACL
                 )
             );
         } elseif ($role !== null  &&  $action !== null) {
-            return $db->insert(
+            $success = $db->insert(
                 'acl_roles',
                 array(
                     'role'       => $role,
@@ -361,7 +362,7 @@ class ACL
             self::reload();
         };
 
-        return false;
+        return $success;
     }
 
     /**
@@ -389,13 +390,13 @@ class ACL
     public static function revoke($userId = null, $role = null, $action = null, $objectType = '*', $objectId = 0)
     {
         global $PPHP;
-        $db = $PPHP['db'];
+        $success = $db = $PPHP['db'];
 
         if ($objectId === '') {
             $objectId = 0;
         };
         if ($userId !== null  &&  $role !== null) {
-            return $db->exec(
+            $success = $db->exec(
                 "
                 DELETE FROM users_roles WHERE userId=? AND role=?
                 ",
@@ -405,7 +406,7 @@ class ACL
                 )
             );
         } elseif ($userId !== null  &&  $action !== null) {
-            return $db->exec(
+            $success = $db->exec(
                 "
                 DELETE FROM acl_users
                 WHERE userId=? AND action=? AND objectType=? AND objectId=?
@@ -418,7 +419,7 @@ class ACL
                 )
             );
         } elseif ($role !== null  &&  $action !== null) {
-            return $db->exec(
+            $success = $db->exec(
                 "
                 DELETE FROM acl_roles
                 WHERE role=? AND action=? AND objectType=? AND objectId=?
@@ -438,7 +439,7 @@ class ACL
             self::reload();
         };
 
-        return false;
+        return $success;
     }
 
     /**
