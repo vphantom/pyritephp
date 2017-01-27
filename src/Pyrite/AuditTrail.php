@@ -64,7 +64,8 @@ class AuditTrail
                 action VARCHAR(64) NOT NULL DEFAULT '',
                 fieldName VARCHAR(64) DEFAULT NULL,
                 oldValue VARCHAR(255) DEFAULT NULL,
-                newValue VARCHAR(255) DEFAULT NULL
+                newValue VARCHAR(255) DEFAULT NULL,
+                content TEXT NOT NULL DEFAULT ''
             )
             "
         );
