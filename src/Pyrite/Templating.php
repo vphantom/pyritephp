@@ -85,7 +85,7 @@ class Templating
             'debug' => $PPHP['config']['global']['debug']
         );
         if ($PPHP['config']['global']['production'] === true) {
-            $twigConfig['cache'] = __DIR__ . '/var/twig_cache';
+            $twigConfig['cache'] = $PPHP['config']['global']['docroot'] . $PPHP['config']['global']['twig_path'];
         };
         $twig = new \Twig_Environment($twigLoader, $twigConfig);
         $twig->addFunction(

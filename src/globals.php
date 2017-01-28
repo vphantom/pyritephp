@@ -75,6 +75,13 @@ class Pyrite
         // Load configuration
         $PPHP['config'] = parse_ini_file('config.ini', true);
 
+        // Work around limitation of PHP's handling of true and false entries
+        $PPHP['config']['global']['debug'] = (bool)$PPHP['config']['global']['debug'];
+        $PPHP['config']['global']['production'] = (bool)$PPHP['config']['global']['production'];
+
+        // Pass project's global __DIR__ a.k.a. document root
+        $PPHP['config']['global']['docroot'] = $dir . '/';
+
         // Watchdog
         $watchdog = new Pyrite\Core\Watchdog();
         if (array_key_exists('mail_errors_to', $PPHP['config']['global'])) {
