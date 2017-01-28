@@ -15,6 +15,84 @@
 
 namespace Pyrite;
 
+
+/**
+ * Pyrite_Twig_ExitNode class
+ *
+ * @category  Library
+ * @package   PyritePHP
+ * @author    Stéphane Lavergne <lis@imars.com>
+ * @copyright 2016 Stéphane Lavergne
+ * @license   https://opensource.org/licenses/MIT  MIT
+ * @link      https://github.com/vphantom/pyrite-php
+ */
+class Pyrite_Twig_ExitNode extends \Twig_Node
+{
+    /**
+     * Constructor
+     *
+     * @param object $line from getLine()
+     * @param object $tag  from getTag()
+     */
+    public function __construct($line, $tag = null)
+    {
+        parent::__construct(array(), array(), $line, $tag);
+    }
+
+    /**
+     * Compile tag into PHP
+     *
+     * @param object $compiler Twig_Compiler
+     *
+     * @return null
+     */
+    public function compile(\Twig_Compiler $compiler)
+    {
+        $compiler->addDebugInfo($this)->write("return;\n");
+    }
+}
+
+/**
+ * Pyrite_Twig_TokenParser class
+ *
+ * @category  Library
+ * @package   PyritePHP
+ * @author    Stéphane Lavergne <lis@imars.com>
+ * @copyright 2016 Stéphane Lavergne
+ * @license   https://opensource.org/licenses/MIT  MIT
+ * @link      https://github.com/vphantom/pyrite-php
+ */
+class Pyrite_Twig_TokenParser extends \Twig_TokenParser
+{
+    /**
+     * Invoked by parser when "exit" tag encountered.
+     *
+     * @param object $token Current token
+     *
+     * @return object
+     */
+    public function parse(\Twig_Token $token)
+    {
+        $parser = $this->parser;
+        $stream = $parser->getStream();
+
+        $stream->expect(\Twig_Token::BLOCK_END_TYPE);
+
+        return new Pyrite_Twig_ExitNode($token->getLine(), $this->getTag());
+    }
+
+    /**
+     * Returns the tag we want to parse
+     *
+     * @return string
+     */
+    public function getTag()
+    {
+        return 'exit';
+    }
+}
+
+
 /**
  * Templating class
  *
@@ -146,6 +224,9 @@ class Templating
                 )
             );
         };
+
+        // exit tag
+        $twig->addTokenParser(new Pyrite_Twig_TokenParser());
 
         // Load utilities globally
         try {
