@@ -181,11 +181,26 @@ class Pyrite
             filter_var($name, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES|FILTER_FLAG_STRIP_LOW)
         );
     }
+
+    /**
+     * Hide most of the user part of an e-mail address
+     *
+     * @param string $email String to filter
+     *
+     * @return string
+     */
+    function protectEmail($email)
+    {
+        $chunks = explode('@', $email);
+        $chunks[0] = $chunks[0][0] . '******';
+        return implode('@', $chunks);
+    }
 }
 
 add_filter('clean_filename', 'Pyrite::cleanFilename');
 add_filter('clean_email',    'Pyrite::cleanEmail');
 add_filter('clean_name',     'Pyrite::cleanName');
+add_filter('protect_email',  'Pyrite::protectEmail');
 
 // Included modules which have start-up definitions
 Pyrite\ACL::bootstrap();
