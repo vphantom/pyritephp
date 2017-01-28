@@ -192,7 +192,7 @@ class Pyrite
     function protectEmail($email)
     {
         $chunks = explode('@', $email);
-        $chunks[0] = $chunks[0][0] . '******';
+        $chunks[0] = substr($chunks[0], 0, 2) . '****';
         return implode('@', $chunks);
     }
 }
