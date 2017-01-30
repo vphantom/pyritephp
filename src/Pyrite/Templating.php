@@ -191,6 +191,13 @@ class Templating
         );
         $twig->addFunction(
             new \Twig_SimpleFunction(
+                '__', function () {
+                    return call_user_func_array('self::gettext', func_get_args());
+                }
+            )
+        );
+        $twig->addFunction(
+            new \Twig_SimpleFunction(
                 'title', function () {
                     return call_user_func_array('self::title', func_get_args());
                 }
@@ -302,6 +309,31 @@ class Templating
     public static function setLang($code)
     {
         self::$_lang = $code;
+    }
+
+    /**
+     * Simple no-plurals translation lookup in config.ini
+     *
+     * @param string $string String
+     *
+     * @return string Translated string in current locale
+     */
+    function gettext($string)
+    {
+        global $PPHP;
+        $req = grab('request');
+
+        $default = $PPHP['config']['global']['default_lang'];
+        $current = $req['lang'];
+        $l = $PPHP['config']['lang'];
+
+        $res = $string;
+        if (isset($l[$current][$string])) {
+            $res = $l[$current][$string];
+        } elseif (isset($l[$default][$string])) {
+            $res = $l[$default][$string];
+        };
+        return $res;
     }
 
     /**
