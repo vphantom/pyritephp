@@ -532,11 +532,13 @@ on(
                     switch ($_POST['f']) {
 
                     case 'add':
+                        if (!pass('form_validate', 'admin_user_acl_add')) return trigger('http_status', 440);
                         $added = true;
                         $success = pass('grant', $_GET['id'], null, $_POST['action'], $_POST['objectType'], $_POST['objectId']);
                         break;
 
                     case 'del':
+                        if (!pass('form_validate', 'admin_user_acl_del')) return trigger('http_status', 440);
                         $deleted = true;
                         $success = pass('revoke', $_GET['id'], null, $_POST['action'], $_POST['objectType'], $_POST['objectId']);
                         break;
@@ -546,17 +548,21 @@ on(
                 };
 
                 if (isset($_POST['addrole'])) {
+                    if (!pass('form_validate', 'admin_user_role')) return trigger('http_status', 440);
                     $added = true;
                     $success = pass('grant', $_GET['id'], $_POST['addrole']);
                 } elseif (isset($_POST['delrole'])) {
+                    if (!pass('form_validate', 'admin_user_role')) return trigger('http_status', 440);
                     $deleted = true;
                     $success = pass('revoke', $_GET['id'], $_POST['delrole']);
                 } elseif (isset($_POST['unban'])) {
+                    if (!pass('form_validate', 'admin_user_ban')) return trigger('http_status', 440);
                     $saved = true;
                     $user['active'] = 1;
                     $success = pass('unban_user', $_GET['id']);
                     trigger('log', 'user', $_GET['id'], 'activated');
                 } elseif (isset($_POST['ban'])) {
+                    if (!pass('form_validate', 'admin_user_ban')) return trigger('http_status', 440);
                     $saved = true;
                     $user['active'] = 0;
                     $success = pass('ban_user', $_GET['id']);
@@ -595,6 +601,9 @@ on(
             break;
 
         default:
+            if (isset($_POST['name']) || isset($_POST['email'])) {
+                if (!pass('form_validate', 'user_search')) return trigger('http_status', 440);
+            };
             $users = \Pyrite\Users::search(
                 isset($_POST['email']) && strlen($_POST['email']) > 2 ? $_POST['email'] : null,
                 isset($_POST['name']) && strlen($_POST['name']) > 2 ? $_POST['name'] : null
@@ -628,6 +637,7 @@ on(
         switch ($f) {
 
         case 'add':
+            if (!pass('form_validate', 'admin_role_acl_add')) return trigger('http_status', 440);
             if (!pass('can', 'edit', 'role')) return trigger('http_status', 403);
 
             $added = true;
@@ -635,6 +645,7 @@ on(
             break;
 
         case 'del':
+            if (!pass('form_validate', 'admin_role_acl_del')) return trigger('http_status', 440);
             if (!pass('can', 'edit', 'role')) return trigger('http_status', 403);
 
             $deleted = true;
