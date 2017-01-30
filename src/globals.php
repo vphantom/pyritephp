@@ -584,7 +584,7 @@ on(
 
             trigger(
                 'render',
-                'admin_users_edit.html',
+                'users_edit.html',
                 array(
                     'actions'     => $PPHP['config']['acl']['actions'],
                     'objectTypes' => $PPHP['config']['acl']['objectTypes'],
@@ -611,7 +611,7 @@ on(
             );
             trigger(
                 'render',
-                'admin_users.html',
+                'users.html',
                 array(
                     'users' => $users
                 )
@@ -658,7 +658,7 @@ on(
 
         trigger(
             'render',
-            'admin_roles.html',
+            'roles.html',
             array(
                 'actions'     => $PPHP['config']['acl']['actions'],
                 'objectTypes' => $PPHP['config']['acl']['objectTypes'],
