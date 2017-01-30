@@ -252,7 +252,7 @@ on(
                         );
                     };
                 };
-                return trigger('render', 'login.html');
+                return trigger('http_status', 449);
             };
         };
 
@@ -364,6 +364,7 @@ on(
             $_POST['onetime'] = true;
             if (($onetime = grab('user_create', $_POST)) !== false) {
                 $success = true;
+                trigger('http_status', 201);
                 if (pass('can', 'create', 'user')) {
                     trigger(
                         'sendmail',
