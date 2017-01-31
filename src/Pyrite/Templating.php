@@ -106,6 +106,7 @@ class Pyrite_Twig_TokenParser extends \Twig_TokenParser
 class Templating
 {
     private static $_twig;
+    private static $_gettext;
     private static $_title = '';
     private static $_status = 200;
     private static $_template;
@@ -244,6 +245,24 @@ class Templating
 
         self::$_twig = $twig;
 
+        // Non-system gettext init
+        $localeDir = $PPHP['dir'] . '/locales/';
+        self::$_gettext = new \Gettext\Translator();
+        $pos = array($localeDir . self::$_lang . '.po');
+        if (self::$_lang !== $PPHP['config']['global']['default_lang']) {
+            $pos[] = $localeDir . $PPHP['config']['global']['default_lang'] . '.po';
+        };
+        foreach ($pos as $po) {
+            if (file_exists($po)) {
+                try {
+                    self::$_gettext->loadTranslations(\Gettext\Translations::fromPoFile($po));
+                    break;
+                } catch (\Exception $e) {
+                    echo $e->getMessage();
+                };
+            };
+        };
+
         $req = grab('request');
         if (self::$_status !== 200) {
             http_response_code(self::$_status);
@@ -325,13 +344,14 @@ class Templating
 
         $default = $PPHP['config']['global']['default_lang'];
         $current = $req['lang'];
-        $l = $PPHP['config']['lang'];
 
         $res = $string;
-        if (isset($l[$current][$string])) {
-            $res = $l[$current][$string];
-        } elseif (isset($l[$default][$string])) {
-            $res = $l[$default][$string];
+        try {
+            if (self::$_gettext !== null) {
+                $res = self::$_gettext->gettext($string);
+            };
+        } catch (\Exception $e) {
+            echo $e->getMessage();
         };
         return $res;
     }

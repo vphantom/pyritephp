@@ -16,6 +16,7 @@
 		"ext-readline": "*",
 		"ext-session": "*",
 		"twig/twig": "~1.0",
+		"gettext/gettext": "~4.2",
 		"sphido/events": "^0.3.0"
 	},
 	"require-dev": {},
