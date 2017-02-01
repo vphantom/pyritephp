@@ -227,24 +227,24 @@ on(
     function () {
         $req = grab('request');
 
-        if (isset($_GET['email']) && isset($_GET['onetime'])) {
+        if (isset($req['get']['email']) && isset($req['get']['onetime'])) {
 
             // Account creation validation link
-            if (!pass('login', $_GET['email'], null, $_GET['onetime'])) return trigger('http_status', 403);
+            if (!pass('login', $req['get']['email'], null, $req['get']['onetime'])) return trigger('http_status', 403);
         } else {
 
             // Normal login
             if (!pass('form_validate', 'login-form')) return trigger('http_status', 440);
             usleep(500000);
-            if (isset($_POST['password']) && strlen($_POST['password']) > 0) {
-                if (!pass('login', $_POST['email'], $_POST['password'])) return trigger('http_status', 403);
+            if (isset($req['post']['password']) && strlen($req['post']['password']) > 0) {
+                if (!pass('login', $req['post']['email'], $req['post']['password'])) return trigger('http_status', 403);
             } else {
-                if (($user = grab('user_fromemail', $_POST['email'])) !== false) {
+                if (($user = grab('user_fromemail', $req['post']['email'])) !== false) {
                     if (($onetime = grab('user_update', $user['id'], array('onetime' => true))) !== false) {
-                        $link = 'login?' . http_build_query(array( 'email' => $_POST['email'], 'onetime' => $onetime));
+                        $link = 'login?' . http_build_query(array( 'email' => $req['post']['email'], 'onetime' => $onetime));
                         trigger(
                             'sendmail',
-                            "{$user['name']} <{$_POST['email']}>",
+                            "{$user['name']} <{$req['post']['email']}>",
                             'confirmlink',
                             array(
                                 'validation_link' => $link
@@ -273,32 +273,33 @@ on(
     'route/user+prefs',
     function () {
         if (!$_SESSION['identified']) return trigger('http_status', 403);
+        $req = grab('request');
         $saved = false;
         $success = false;
 
         // Settings & Information
-        if (isset($_POST['name'])) {
+        if (isset($req['post']['name'])) {
             if (!pass('form_validate', 'user_prefs')) return trigger('http_status', 440);
             $saved = true;
-            $_POST['name'] = filter('clean_name', $_POST['name']);
-            $success = pass('user_update', $_SESSION['user']['id'], $_POST);
+            $req['post']['name'] = filter('clean_name', $req['post']['name']);
+            $success = pass('user_update', $_SESSION['user']['id'], $req['post']);
         };
 
         // Change e-mail or password
-        if (isset($_POST['email'])) {
-            $_POST['email'] = filter('clean_email', $_POST['email']);
+        if (isset($req['post']['email'])) {
+            $req['post']['email'] = filter('clean_email', $req['post']['email']);
             if (!pass('form_validate', 'user_passmail')) return trigger('http_status', 440);
             $saved = true;
             $oldEmail = filter('clean_email', $_SESSION['user']['email']);
-            if (pass('login', $oldEmail, $_POST['password'])) {
-                if ($success = pass('user_update', $_SESSION['user']['id'], $_POST)) {
+            if (pass('login', $oldEmail, $req['post']['password'])) {
+                if ($success = pass('user_update', $_SESSION['user']['id'], $req['post'])) {
                     $name = filter('clean_name', $_SESSION['user']['name']);
                     trigger(
                         'sendmail',
                         "{$name} <{$oldEmail}>",
                         'editaccount'
                     );
-                    $newEmail = $_POST['email'];
+                    $newEmail = $req['post']['email'];
                     if ($newEmail !== false  &&  $newEmail !== $oldEmail) {
                         trigger(
                             'sendmail',
@@ -309,7 +310,7 @@ on(
                     if ($oldEmail !== $newEmail) {
                         trigger('log', 'user', $_SESSION['user']['id'], 'modified', 'email', $oldEmail, $newEmail);
                     };
-                    if (strlen($_POST['newpassword1']) >= 8) {
+                    if (strlen($req['post']['newpassword1']) >= 8) {
                         trigger('log', 'user', $_SESSION['user']['id'], 'modified', 'password');
                     };
                 };
@@ -354,28 +355,29 @@ on(
 on(
     'route/register',
     function () {
+        $req = grab('request');
         $created = false;
         $success = false;
-        if (isset($_POST['email'])) {
+        if (isset($req['post']['email'])) {
             if (!pass('form_validate', 'registration')) return trigger('http_status', 440);
             $created = true;
-            $_POST['email'] = filter('clean_email', $_POST['email']);
-            $_POST['name'] = filter('clean_name', $_POST['name']);
-            $_POST['onetime'] = true;
-            if (($onetime = grab('user_create', $_POST)) !== false) {
+            $req['post']['email'] = filter('clean_email', $req['post']['email']);
+            $req['post']['name'] = filter('clean_name', $req['post']['name']);
+            $req['post']['onetime'] = true;
+            if (($onetime = grab('user_create', $req['post'])) !== false) {
                 $success = true;
                 trigger('http_status', 201);
                 if (pass('can', 'create', 'user')) {
                     trigger(
                         'sendmail',
-                        "{$_POST['name']} <{$_POST['email']}>",
+                        "{$req['post']['name']} <{$req['post']['email']}>",
                         'invitation'
                     );
                 } else {
-                    $link = 'login?' . http_build_query(array( 'email' => $_POST['email'], 'onetime' => $onetime));
+                    $link = 'login?' . http_build_query(array( 'email' => $req['post']['email'], 'onetime' => $onetime));
                     trigger(
                         'sendmail',
-                        "{$_POST['name']} <{$_POST['email']}>",
+                        "{$req['post']['name']} <{$req['post']['email']}>",
                         'confirmlink',
                         array(
                             'validation_link' => $link
@@ -383,7 +385,7 @@ on(
                     );
                 };
             } else {
-                if (($user = grab('user_fromemail', $_POST['email'])) !== false) {
+                if (($user = grab('user_fromemail', $req['post']['email'])) !== false) {
                     // Onetime failed because user exists, warn of duplicate
                     // attempt via e-mail, don't hint that the user exists on
                     // the web though!
@@ -410,6 +412,7 @@ on(
 on(
     'route/password_reset',
     function () {
+        $req = grab('request');
         $inprogress = false;
         $emailed = false;
         $saved = false;
@@ -431,30 +434,30 @@ on(
          * this stage.
          */
 
-        if (isset($_POST['email']) && isset($_POST['onetime']) && isset($_POST['newpassword1']) && isset($_POST['newpassword2'])) {
+        if (isset($req['post']['email']) && isset($req['post']['onetime']) && isset($req['post']['newpassword1']) && isset($req['post']['newpassword2'])) {
             // 2.2 Form submitted from a valid onetime
             $inprogress = true;
             $saved = true;
-            if (($user = grab('authenticate', $_POST['email'], null, $_POST['onetime'])) !== false) {
+            if (($user = grab('authenticate', $req['post']['email'], null, $req['post']['onetime'])) !== false) {
                 $success = pass(
                     'user_update',
                     $user['id'],
                     array(
-                        'newpassword1' => $_POST['newpassword1'],
-                        'newpassword2' => $_POST['newpassword2']
+                        'newpassword1' => $req['post']['newpassword1'],
+                        'newpassword2' => $req['post']['newpassword2']
                     )
                 );
             };
-        } elseif (isset($_POST['email'])) {
+        } elseif (isset($req['post']['email'])) {
             // 1.2 Form submitted to tell us whom to reset
             $emailed = true;
             $success = true;  // Always pretend it worked
-            if (($user = grab('user_fromemail', $_POST['email'])) !== false) {
+            if (($user = grab('user_fromemail', $req['post']['email'])) !== false) {
                 if (($onetime = grab('user_update', $user['id'], array('onetime' => true))) !== false) {
-                    $link = 'password_reset?' . http_build_query(array( 'email' => $_POST['email'], 'onetime' => $onetime));
+                    $link = 'password_reset?' . http_build_query(array( 'email' => $req['post']['email'], 'onetime' => $onetime));
                     trigger(
                         'sendmail',
-                        "{$user['name']} <{$_POST['email']}>",
+                        "{$user['name']} <{$req['post']['email']}>",
                         'confirmlink',
                         array(
                             'validation_link' => $link
@@ -462,12 +465,12 @@ on(
                     );
                 };
             };
-        } elseif (isset($_GET['email']) && isset($_GET['onetime'])) {
+        } elseif (isset($req['get']['email']) && isset($req['get']['onetime'])) {
             // 2.1 Link from e-mail clicked, display form if onetime valid
             $inprogress = true;
             $saved = false;
-            $email = filter('clean_email', $_GET['email']);
-            if (($user = grab('authenticate', $_GET['email'], null, $_GET['onetime'])) !== false) {
+            $email = filter('clean_email', $req['get']['email']);
+            if (($user = grab('authenticate', $req['get']['email'], null, $req['get']['onetime'])) !== false) {
                 $valid = true;
                 if (($onetime = grab('user_update', $user['id'], array('onetime' => true))) === false) {
                     $onetime = '';
@@ -497,6 +500,7 @@ on(
         global $PPHP;
 
         if (!(pass('can', 'view', 'user') || pass('can', 'create', 'user'))) return trigger('http_status', 403);
+        $req = grab('request');
 
         $f = array_shift($path);
         switch ($f) {
@@ -512,14 +516,14 @@ on(
 
             if (!pass('can', 'edit', 'user')) return trigger('http_status', 403);
 
-            if (isset($_POST['name']) && isset($_GET['id'])) {
+            if (isset($req['post']['name']) && isset($req['get']['id'])) {
                 if (!pass('form_validate', 'user_prefs')) return trigger('http_status', 440);
                 $saved = true;
-                $success = pass('user_update', $_GET['id'], $_POST);
+                $success = pass('user_update', $req['get']['id'], $req['post']);
             };
 
-            if (isset($_GET['id'])) {
-                $user = \Pyrite\Users::resolve($_GET['id']);
+            if (isset($req['get']['id'])) {
+                $user = \Pyrite\Users::resolve($req['get']['id']);
                 if (!$user) {
                     return trigger('http_status', 404);
                 };
@@ -529,57 +533,57 @@ on(
                     return trigger('http_status', 404);
                 };
 
-                if (isset($_POST['f'])) {
-                    switch ($_POST['f']) {
+                if (isset($req['post']['f'])) {
+                    switch ($req['post']['f']) {
 
                     case 'add':
                         if (!pass('form_validate', 'admin_user_acl_add')) return trigger('http_status', 440);
                         $added = true;
-                        $success = pass('grant', $_GET['id'], null, $_POST['action'], $_POST['objectType'], $_POST['objectId']);
+                        $success = pass('grant', $req['get']['id'], null, $req['post']['action'], $req['post']['objectType'], $req['post']['objectId']);
                         break;
 
                     case 'del':
                         if (!pass('form_validate', 'admin_user_acl_del')) return trigger('http_status', 440);
                         $deleted = true;
-                        $success = pass('revoke', $_GET['id'], null, $_POST['action'], $_POST['objectType'], $_POST['objectId']);
+                        $success = pass('revoke', $req['get']['id'], null, $req['post']['action'], $req['post']['objectType'], $req['post']['objectId']);
                         break;
 
                     default:
                     };
                 };
 
-                if (isset($_POST['addrole'])) {
+                if (isset($req['post']['addrole'])) {
                     if (!pass('form_validate', 'admin_user_role')) return trigger('http_status', 440);
                     $added = true;
-                    $success = pass('grant', $_GET['id'], $_POST['addrole']);
-                } elseif (isset($_POST['delrole'])) {
+                    $success = pass('grant', $req['get']['id'], $req['post']['addrole']);
+                } elseif (isset($req['post']['delrole'])) {
                     if (!pass('form_validate', 'admin_user_role')) return trigger('http_status', 440);
                     $deleted = true;
-                    $success = pass('revoke', $_GET['id'], $_POST['delrole']);
-                } elseif (isset($_POST['unban'])) {
+                    $success = pass('revoke', $req['get']['id'], $req['post']['delrole']);
+                } elseif (isset($req['post']['unban'])) {
                     if (!pass('form_validate', 'admin_user_ban')) return trigger('http_status', 440);
                     $saved = true;
                     $user['active'] = 1;
-                    $success = pass('unban_user', $_GET['id']);
-                    trigger('log', 'user', $_GET['id'], 'activated');
-                } elseif (isset($_POST['ban'])) {
+                    $success = pass('unban_user', $req['get']['id']);
+                    trigger('log', 'user', $req['get']['id'], 'activated');
+                } elseif (isset($req['post']['ban'])) {
                     if (!pass('form_validate', 'admin_user_ban')) return trigger('http_status', 440);
                     $saved = true;
                     $user['active'] = 0;
-                    $success = pass('ban_user', $_GET['id']);
-                    trigger('log', 'user', $_GET['id'], 'deactivated');
+                    $success = pass('ban_user', $req['get']['id']);
+                    trigger('log', 'user', $req['get']['id'], 'deactivated');
                 };
 
                 $history = grab(
                     'history',
                     array(
-                        'userId' => $_GET['id'],
+                        'userId' => $req['get']['id'],
                         'order' => 'DESC',
                         'max' => 20
                     )
                 );
-                $rights = grab('user_rights', $_GET['id']);
-                $roles = grab('user_roles', $_GET['id']);
+                $rights = grab('user_rights', $req['get']['id']);
+                $roles = grab('user_roles', $req['get']['id']);
             };
 
             trigger(
@@ -603,10 +607,10 @@ on(
 
         default:
             $keyword = null;
-            if (isset($_POST['keyword'])) {
+            if (isset($req['post']['keyword'])) {
                 if (!pass('form_validate', 'user_search')) return trigger('http_status', 440);
-                if (strlen($_POST['keyword']) > 2) {
-                    $keyword = $_POST['keyword'];
+                if (strlen($req['post']['keyword']) > 2) {
+                    $keyword = $req['post']['keyword'];
                 };
             };
             $users = \Pyrite\Users::search($keyword);
@@ -628,11 +632,12 @@ on(
         global $PPHP;
 
         if (!pass('can', 'view', 'role')) return trigger('http_status', 403);
+        $req = grab('request');
 
         $roleId = array_shift($path);
         if ($roleId === null) $roleId = 'admin';
 
-        $f = isset($_POST['f']) ? $_POST['f'] : null;
+        $f = isset($req['post']['f']) ? $req['post']['f'] : null;
         $success = false;
         $added = false;
         $deleted = false;
@@ -643,7 +648,7 @@ on(
             if (!pass('can', 'edit', 'role')) return trigger('http_status', 403);
 
             $added = true;
-            $success = pass('grant', null, $roleId, $_POST['action'], $_POST['objectType'], $_POST['objectId']);
+            $success = pass('grant', null, $roleId, $req['post']['action'], $req['post']['objectType'], $req['post']['objectId']);
             break;
 
         case 'del':
@@ -651,7 +656,7 @@ on(
             if (!pass('can', 'edit', 'role')) return trigger('http_status', 403);
 
             $deleted = true;
-            $success = pass('revoke', null, $roleId, $_POST['action'], $_POST['objectType'], $_POST['objectId']);
+            $success = pass('revoke', null, $roleId, $req['post']['action'], $req['post']['objectType'], $req['post']['objectId']);
             break;
 
         default:

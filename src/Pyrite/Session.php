@@ -225,15 +225,16 @@ class Session
      */
     public static function validateForm($name)
     {
+        $req = grab('request');
         $name = self::_formHash($name);
         $sess = (isset($_SESSION[$name]) ? $_SESSION[$name] : false);
         $_SESSION[$name] = ' ';
         unset($_SESSION[$name]);
-        if ($sess && isset($_POST[$name]) && $_POST[$name] === $sess) {
-            unset($_POST[$name]);
+        if ($sess && isset($req['post'][$name]) && $req['post'][$name] === $sess) {
+            unset($req['post'][$name]);
             return true;
         } else {
-            $_POST = array();
+            $req['post'] = array();
             return false;
         };
     }

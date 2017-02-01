@@ -132,6 +132,16 @@ class Router
         self::$_req['get'] = $_GET;
         self::$_req['post'] = $_POST;
 
+        foreach (array('get', 'post') as $method) {
+            if (isset(self::$_req[$method]['__arrays'])) {
+                foreach (self::$_req[$method]['__arrays'] as $key) {
+                    if (!isset(self::$_req[$method][$key])) {
+                        self::$_req[$method][$key] = array();
+                    };
+                };
+            };
+        };
+
         // Process file uploads
         self::$_req['files'] = array();
         if (isset($_FILES) && count($_FILES) > 0) {
