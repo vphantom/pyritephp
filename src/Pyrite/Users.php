@@ -319,28 +319,34 @@ class Users
      * Search directory of users
      *
      * For each matching user, each row returned is limited to id, active,
-     * email and name.  Specifying neither option is valid and returns all
-     * users.
+     * email and name.  Specifying no keyword is valid and returns all users.
+     *
+     * Keyword matching is done on e-mail, name, profession and employer.
      *
      * No more than 100 users will be returned.
      *
-     * @param string|null $email Substring match on email
-     * @param string|null $name  Substring match on name
+     * @param string|null $keyword Substring search
      *
      * @return array
      */
-    public static function search($email = null, $name = null)
+    public static function search($keyword = null)
     {
         global $PPHP;
         $db = $PPHP['db'];
+
         $query = $db->query('SELECT id, email, active, name FROM users');
         $conditions = array();
-        if ($email !== null) {
-            $conditions[] = $db->query('email LIKE ?', "%{$email}%");
+
+        // Keyword matching
+        if ($keyword !== null) {
+            $search = array();
+            $search[] = $db->query('email LIKE ?', "%{$keyword}%");
+            $search[] = $db->query('name LIKE ?', "%{$keyword}%");
+            $search[] = $db->query('profession LIKE ?', "%{$keyword}%");
+            $search[] = $db->query('employer LIKE ?', "%{$keyword}%");
+            $conditions[] = $db->query()->implodeClosed('OR', $search);
         };
-        if ($name !== null) {
-            $conditions[] = $db->query('name LIKE ?', "%{$name}%");
-        };
+
         if (count($conditions) > 0) {
             $query->append('WHERE')->implode('AND', $conditions);
         } else {

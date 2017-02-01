@@ -602,13 +602,14 @@ on(
             break;
 
         default:
-            if (isset($_POST['name']) || isset($_POST['email'])) {
+            $keyword = null;
+            if (isset($_POST['keyword'])) {
                 if (!pass('form_validate', 'user_search')) return trigger('http_status', 440);
+                if (strlen($_POST['keyword']) > 2) {
+                    $keyword = $_POST['keyword'];
+                };
             };
-            $users = \Pyrite\Users::search(
-                isset($_POST['email']) && strlen($_POST['email']) > 2 ? $_POST['email'] : null,
-                isset($_POST['name']) && strlen($_POST['name']) > 2 ? $_POST['name'] : null
-            );
+            $users = \Pyrite\Users::search($keyword);
             trigger(
                 'render',
                 'users.html',
