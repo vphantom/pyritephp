@@ -15,7 +15,7 @@
 		"ext-pdo_sqlite": "*",
 		"ext-readline": "*",
 		"ext-session": "*",
-		"twig/twig": "~1.0",
+		"twig/twig": "~2.1",
 		"gettext/gettext": "~4.2",
 		"sphido/events": "^0.3.0"
 	},

@@ -160,7 +160,7 @@ class Templating
 
         $twigLoader->addPath($tplBase);
         $twigConfig = array(
-            'autoescape' => true,
+            'autoescape' => 'html',
             'debug' => $PPHP['config']['global']['debug']
         );
         if ($PPHP['config']['global']['production'] === true) {
@@ -235,13 +235,6 @@ class Templating
 
         // exit tag
         $twig->addTokenParser(new Pyrite_Twig_TokenParser());
-
-        // Load utilities globally
-        try {
-            $twig->addGlobal('lib', $twig->loadTemplate('lib'));
-        } catch (\Exception $e) {
-            echo $e->getMessage();
-        };
 
         self::$_twig = $twig;
 
