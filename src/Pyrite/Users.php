@@ -46,6 +46,7 @@ class Users
         on('user_search',    'Pyrite\Users::search');
         on('ban_user',       'Pyrite\Users::ban');
         on('unban_user',     'Pyrite\Users::unban');
+        on('clean_userids',  'Pyrite\Users::cleanList');
     }
 
     /**
@@ -383,5 +384,57 @@ class Users
         global $PPHP;
         $db = $PPHP['db'];
         return $db->exec("UPDATE users SET active='1' WHERE id=?", array($id));
+    }
+
+    /**
+     * Resolve all items of a list into userIDs
+     *
+     * - If an item is a valid active userID, it is left intact;
+     *
+     * - If an item is numeric but not a valid active userID, it is removed;
+     *
+     * - If an item is the e-mail address of a valid user, it is replaced with
+     * that userID;
+     *
+     * - If an item is otherwise a string resembling an e-mail address, a new
+     * user is created with that address and supplemental columns found in
+     * $userData[$email] in order to replace it with a freshly created userID.
+     *
+     * @param array $list     Mixed list of numbers and e-mail addresses
+     * @param array $userData Extra columns for each user keyed by e-mail
+     *
+     * @return array Clean list of valid userIDs
+     */
+    public static function cleanList($list, $userData)
+    {
+        global $PPHP;
+        $db = $PPHP['db'];
+
+        $db->begin();
+
+        $q = $db->query('SELECT id FROM users WHERE');
+        $q->append('id IN')->varsClosed($list);
+        $q->append('OR email IN')->varsClosed($list);
+        $out = $db->selectList($q);
+
+        foreach ($list as $email) {
+            if (preg_match('/^[^@ ]+@[^@ .]+\.[^@ ]+$/', $email) == 1) {
+                if (isset($userData[$email])) {
+                    $cols = $userData[$email];
+                } else {
+                    $cols = array();
+                };
+                $cols['email'] = $email;
+                $newbie = self::create($cols);
+                if ($newbie !== false) {
+                    $out[] = $newbie;
+                };
+
+            };
+        };
+
+        $db->commit();
+
+        return $out;
     }
 }
