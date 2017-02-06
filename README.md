@@ -55,7 +55,7 @@ Pyrite::shutdown();
 You probably want to use our [example basic application](https://github.com/vphantom/pyritephp-example) as a full-featured starting point instead, for example if you want to create `foo/`:
 
 ```sh
-$ composer create-project vphantom/pyriteview foo
+$ composer create-project vphantom/pyritephp-example foo
 ```
 
 ### Requirements
