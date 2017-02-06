@@ -1,5 +1,7 @@
 # PyritePHP
 
+[![license](https://img.shields.io/github/license/vphantom/pyritephp.svg?style=plastic)]() [![GitHub release](https://img.shields.io/github/release/vphantom/pyritephp.svg?style=plastic)]() [![Packagist](https://img.shields.io/packagist/v/vphantom/pyritephp.svg?style=plastic)]()
+
 PHP 5 and Bootstrap 3 framework to kick-start multilingual web application development
 
 Simple event-driven framework for creating PHP 5 applications backed by a PDO database and with a Twitter Bootstrap user interface.  Emphasis has been given on security:
