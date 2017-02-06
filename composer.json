@@ -1,6 +1,6 @@
 {
-	"name": "vphantom/pyritephp-core",
-	"description": "PyritePHP Core",
+	"name": "vphantom/pyritephp",
+	"description": "PyritePHP",
 	"license": "MIT",
 	"authors": [
 		{
