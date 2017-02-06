@@ -1,0 +1,178 @@
+/* Main styles */
+
+body {
+	padding-top: 70px;
+}
+
+.inline {
+	display: inline-block;
+}
+
+.optional {
+	background-color: #f4f6f8;
+	padding: 0.5em;
+}
+
+.panel-heading {
+	font-weight: bold;
+}
+
+.fit {
+	white-space: nowrap;
+	width: 1%;
+}
+
+.text-muted.small {
+	font-style: italic;
+}
+
+.label a {
+	color: #fff;
+}
+h1 .label, h2 .label, h3 .label {
+	font-size: 50%;
+}
+h1 .label-default, h2 .label-default, h3 .label-default {
+	background-color: #bbb;
+}
+h3 {
+	margin-top: 2em;
+}
+
+div.spaced {
+	margin-bottom: 2em;
+}
+
+tbody.spaced:after {
+	content: '';
+	display: table-row;
+	height: 20px;
+}
+
+/* Assorted text colors, useful for glyphicons */
+.fg-new, .fg-info, .fg-pending, .fg-ok, .fg-stalled, .fg-warn, .fg-err {
+	text-shadow: 0 0 1px #888;
+}
+.fg-new {
+	color: #ffee00;
+}
+.fg-info, .fg-pending {
+	color: #80f;
+}
+.fg-ok {
+	color: #00aa00;
+}
+.fg-warn, .fg-stalled {
+	color: #ff8800;
+}
+.fg-err {
+	color: #cc0000;
+}
+
+.panel-body .table {
+	margin-bottom: 0;
+}
+
+.form-toolbar .btn {
+	padding: 0;
+}
+
+tr.table-section {
+	text-transform: uppercase;
+}
+
+input, select, textarea {
+	color: #333 !important;  /* Bootstrap 3's #555 is excessively low-contrast */
+}
+.input-like {
+	height: auto !important;
+}
+
+.fileupload-multiple {
+	margin-bottom: 3px;
+}
+
+.log-content {
+	padding-left: 10px;
+	padding-right: 20px;
+	margin-left: 20px;
+	color: #666;
+	font-size: 90%;
+	border-left: 3px solid #888;
+}
+
+/* Large sizes */
+.grow-2x { font-size: 2em; }
+.grow-3x { font-size: 3em; }
+.grow-4x { font-size: 4em; }
+.grow-5x { font-size: 5em; }
+
+/* Hide-away boxes (brought back by JS) */
+.hideaway {
+	position: fixed;
+	left: -100%;
+}
+
+/* Selectize for users */
+.name_email_label {
+}
+.name_email_label .name {
+	color: #000;
+}
+.name_email_label .email {
+	color: #888;
+	display: block;
+}
+.name_email_tag {
+}
+.name_email_tag .name {
+	color: #000;
+}
+.name_email_tag .email {
+	color: #888;
+}
+.name_email_tag .email:before {
+	content: ' <';
+}
+.name_email_tag .email:after {
+	content: '>';
+}
+
+/* Left menu */
+.nav-sidebar {
+	margin: 0 -21px 20px -20px;
+}
+.nav-sidebar .active, .nav-sidebar .active:hover {
+	color: #fff;
+	background-color: #428bca;
+}
+.nav-sidebar .nav-second-level .active, .nav-sidebar .nav-second-level .active:hover {
+	color: #fff;
+	background-color: #62abea;
+}
+.nav-sidebar .nav-second-level {
+	padding-left: 30px;
+}
+.nav-sidebar .nav-second-level li {
+	display: inline-block;
+}
+.sidebar {
+	background-color: #f5f5f5;
+	border-right: 1px solid #eee;
+	left: 0;
+	display: block;
+}
+@media (min-width: 768px) {
+	.sidebar {
+		position: fixed;
+		bottom: 0;
+		z-index: 1000;
+		top: 51px;
+		padding: 20px;
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
+	.nav-sidebar .nav-second-level li {
+		display: block;
+	}
+}

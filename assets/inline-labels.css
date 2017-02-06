@@ -1,0 +1,48 @@
+div.input-block {
+	position: relative;
+	z-index: 9;
+}
+
+div.input-block .input-error {
+	display: inline-block;
+	position: absolute;
+	top: 0;
+	right: 15px;
+	z-index: 8;
+	font-size: 70%;
+	margin: 6px;
+	background-color: #fff;
+	color: #f44;
+}
+
+div.input-block label {
+	position: absolute;
+	top: 0;
+	left: 16px;
+	z-index: 7;
+	margin: 6px;
+	font-size: 80%;
+	color: #999;
+	font-weight: normal;
+}
+
+div.input-block input, div.input-block textarea, div.input-block select, div.input-block .btn,
+div.input-block .selectize-input, div.input-block .selectize-control.multi .selectize-input.has-items
+{
+	position: relative;
+	/* z-index: 10; */
+	/* background-color: transparent !important; */
+	padding: 1.5em 6px 6px 6px;
+	height: auto;
+}
+
+}
+
+/* Work around Chrome brute forcing yellow on autofill since 2008 */
+:-webkit-autofill,
+:-webkit-autofill:hover,
+:-webkit-autofill:focus,
+:-webkit-autofill:active {
+	-webkit-transition: color 9999s ease-out, background-color 9999s ease-out;
+	-webkit-transition-delay: 9999s;
+}

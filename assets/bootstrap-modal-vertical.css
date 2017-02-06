@@ -1,0 +1,35 @@
+/* Inspired by http://stackoverflow.com/a/24829651 */
+
+.modal-vertical {
+	pointer-events: none;
+}
+
+.modal-vertical .modal-middle {
+	pointer-events: none;
+}
+
+.modal-content {
+	pointer-events: all;
+}
+
+@media only screen and (min-width: 768px) {
+
+	.modal-vertical {
+		display: table;
+		height: 100%;
+		width: 100%;
+	}
+
+	.modal-vertical .modal-middle {
+		display: table-cell !important;
+		vertical-align: middle !important;
+	}
+
+	.modal-content {
+		width: inherit !important;
+		height: inherit !important;
+		margin: 0 auto;
+	}
+
+}
+
