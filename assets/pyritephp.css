@@ -52,12 +52,19 @@ tbody.spaced:after {
 }
 
 .log-content {
-	padding-left: 10px;
+	padding-left: 6px;
 	padding-right: 20px;
-	margin-left: 20px;
+	margin-left: 30px;
 	color: #666;
 	font-size: 90%;
-	border-left: 3px solid #888;
+	border-left: 2px solid #bbb;
+}
+.log-content:before {
+	content: '\e111';
+	font-family: 'Glyphicons Halflings';
+	float: left;
+	margin-left: -30px;
+	color: #666;
 }
 
 /* Large sizes */
