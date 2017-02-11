@@ -133,74 +133,13 @@ class Pyrite
     {
         trigger('shutdown');
     }
-
-    /**
-     * Sanitize file name
-     *
-     * This is for base file names: even dots are filtered out.
-     *
-     * Spaces are reduced and translated into underscores.
-     *
-     * CAVEAT: does not allow accented characters, commas, and anything else
-     * beyond alphanumeric, underscore and hyphen characters.
-     *
-     * @param string $name String to filter
-     *
-     * @return string
-     */
-    function cleanFilename($name)
-    {
-        return preg_replace('/[^a-zA-Z0-9_-]/', '', preg_replace('/\s+/', '_', $name));
-    }
-
-    /**
-     * Sanitize e-mail address
-     *
-     * @param string $email String to filter
-     *
-     * @return string
-     */
-    function cleanEmail($email)
-    {
-        // filter_var()'s FILTER_SANITIZE_EMAIL is way too permissive
-        return preg_replace('/[^a-zA-Z0-9@.,_+-]/', '', $email);
-    }
-
-    /**
-     * Strip low-ASCII and <>`|\"' from string
-     *
-     * @param string $name String to filter
-     *
-     * @return string
-     */
-    function cleanName($name)
-    {
-        return preg_replace(
-            '/[<>`|\\"\']/',
-            '',
-            filter_var($name, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES|FILTER_FLAG_STRIP_LOW)
-        );
-    }
-
-    /**
-     * Hide most of the user part of an e-mail address
-     *
-     * @param string $email String to filter
-     *
-     * @return string
-     */
-    function protectEmail($email)
-    {
-        $chunks = explode('@', $email);
-        $chunks[0] = substr($chunks[0], 0, 2) . '****';
-        return implode('@', $chunks);
-    }
 }
 
-add_filter('clean_filename', 'Pyrite::cleanFilename');
-add_filter('clean_email',    'Pyrite::cleanEmail');
-add_filter('clean_name',     'Pyrite::cleanName');
-add_filter('protect_email',  'Pyrite::protectEmail');
+add_filter('clean_filename', 'Pyrite\Core\Filters::cleanFilename');
+add_filter('clean_email',    'Pyrite\Core\Filters::cleanEmail');
+add_filter('clean_name',     'Pyrite\Core\Filters::cleanName');
+add_filter('protect_email',  'Pyrite\Core\Filters::protectEmail');
+add_filter('html_to_text',   'Pyrite\Core\Filters::html2text');
 
 // Included modules which have start-up definitions
 Pyrite\ACL::bootstrap();
