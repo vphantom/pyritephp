@@ -199,6 +199,10 @@ class Router
      */
     public static function run()
     {
+        if (!pass('validate_request', 'route/' . self::$_base)) {
+            return;
+        };
+
         if (self::$_base !== null  &&  !pass('route/' . self::$_base, self::$_PATH)) {
             trigger('http_status', 500);
         };

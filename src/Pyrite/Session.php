@@ -35,13 +35,14 @@ class Session
      */
     public static function bootstrap()
     {
-        on('startup',       'Pyrite\Session::startup', 10);
-        on('shutdown',      'Pyrite\Session::shutdown', 99);
-        on('login',         'Pyrite\Session::login', 1);
-        on('logout',        'Pyrite\Session::reset', 1);
-        on('user_changed',  'Pyrite\Session::reloadUser', 1);
-        on('form_begin',    'Pyrite\Session::beginForm');
-        on('form_validate', 'Pyrite\Session::validateForm');
+        on('startup',        'Pyrite\Session::startup', 10);
+        on('shutdown',       'Pyrite\Session::shutdown', 99);
+        on('login',          'Pyrite\Session::login', 1);
+        on('logout',         'Pyrite\Session::reset', 1);
+        on('user_changed',   'Pyrite\Session::reloadUser', 1);
+        on('outbox_changed', 'Pyrite\Session::reloadOutbox');
+        on('form_begin',     'Pyrite\Session::beginForm');
+        on('form_validate',  'Pyrite\Session::validateForm');
     }
 
     /**
@@ -122,6 +123,7 @@ class Session
         $_SESSION['magic'] = self::_magic();
         $_SESSION['user'] = null;
         $_SESSION['identified'] = false;
+        $_SESSION['outbox'] = array();
     }
 
     /**
@@ -165,6 +167,7 @@ class Session
             };
             $_SESSION['user'] = $user;
             $_SESSION['identified'] = true;
+            self::reloadOutbox();
             trigger('newuser');
             if (pass('can', 'login')) {
                 return true;
@@ -187,6 +190,16 @@ class Session
     public static function reloadUser($data)
     {
         $_SESSION['user'] = $data;
+    }
+
+    /**
+     * Refresh session cache of user's outbox
+     *
+     * @return null
+     */
+    public static function reloadOutbox()
+    {
+        $_SESSION['outbox'] = grab('outbox');
     }
 
     /**

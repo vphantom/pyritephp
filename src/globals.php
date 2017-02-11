@@ -78,6 +78,7 @@ class Pyrite
         // Work around limitation of PHP's handling of true and false entries
         $PPHP['config']['global']['debug'] = (bool)$PPHP['config']['global']['debug'];
         $PPHP['config']['global']['production'] = (bool)$PPHP['config']['global']['production'];
+        $PPHP['config']['global']['force_outbox'] = (bool)$PPHP['config']['global']['force_outbox'];
 
         // Pass project's global __DIR__ a.k.a. document root
         $PPHP['config']['global']['docroot'] = $dir . '/';
@@ -615,5 +616,72 @@ on(
                 'deleted'     => $deleted
             )
         );
+    }
+);
+
+on(
+    'route/outbox',
+    function ($path) {
+        if (!$_SESSION['identified']) return trigger('http_status', 403);
+        if (!pass('can', 'edit', 'email')) return trigger('http_status', 403);
+
+        $req = grab('request');
+        $id = array_shift($path);
+        $email = null;
+        $sent = false;
+        $success = false;
+
+        if ($id !== null) {
+            if (isset($req['post']['subject'])) {
+                $sent = true;
+                if (pass(
+                    'outbox_save',
+                    $id,
+                    $req['post']['recipients'],
+                    $req['post']['ccs'],
+                    $req['post']['bccs'],
+                    $req['post']['subject'],
+                    $req['post']['html']
+                ) !== false
+                ) {
+                    $success = pass('outbox_send', $id);
+                };
+            };
+            if (!$success) {
+                $email = grab('outbox_email', $id);
+            };
+        };
+
+        trigger(
+            'render',
+            'outbox.html',
+            array(
+                'sent' => $sent,
+                'success' => $success,
+                'email' => $email
+            )
+        );
+    }
+);
+
+// If config.global.force_outbox and there are pending messages, force user to
+// '/outbox' instead of anywhere else
+on(
+    'validate_request',
+    function ($route) {
+        global $PPHP;
+        $force_outbox = $PPHP['config']['global']['force_outbox'];
+
+        if ($route !== 'route/outbox'
+            && $force_outbox
+            && $_SESSION['identified']
+            && isset($_SESSION['outbox'])
+            && count($_SESSION['outbox']) > 0
+        ) {
+            $req = grab('request');
+            trigger('http_redirect', $req['base'] . '/outbox');
+            return false;
+        };
+        return true;
     }
 );
