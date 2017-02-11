@@ -51,7 +51,7 @@ $().ready(function() {  // eslint-disable-line max-statements
   };
   var locale = locales[lang];
 
-  var excludedInputs = 'input[type=button], input[type=submit], input[type=reset], input[type=hidden], .input-like input';  // eslint-disable-line max-len
+  var excludedInputs = 'input[type=button], input[type=submit], input[type=reset], input[type=hidden], .input-like input, .rich-edit';  // eslint-disable-line max-len
 
   // A valid e-mail for us has: nospaces, '@', nospaces, '.', nospaces
   // Actual RFC822 implementations are pages long and wouldn't benefit us much.
@@ -479,7 +479,6 @@ $().ready(function() {  // eslint-disable-line max-statements
 
   // Initialize Summernote
   $('.rich-edit').summernote({
-    height : 200,
     lang   : locale,
     toolbar: [
       ['style', ['style']],

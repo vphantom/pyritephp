@@ -23,6 +23,29 @@ tbody.spaced:after {
 	height: 20px;
 }
 
+.inbox table td.widest {
+	width: 100%;
+}
+.inbox table div.window {
+	width: 0;
+	min-width: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding-bottom: 0.1em;
+}
+.inbox table .time {
+	white-space: nowrap;
+	text-align: right;
+}
+.inbox table a {
+	color: #333;
+}
+.inbox table a:hover {
+	text-decoration: none;
+	cursor: pointer;
+}
+
 /* Assorted text colors, useful for glyphicons */
 .fg-new, .fg-info, .fg-pending, .fg-ok, .fg-stalled, .fg-warn, .fg-err {
 	text-shadow: 0 0 1px #888;
@@ -41,6 +64,10 @@ tbody.spaced:after {
 }
 .fg-err {
 	color: #cc0000;
+}
+
+form label {
+	text-transform: capitalize;
 }
 
 .input-like {
@@ -65,6 +92,40 @@ tbody.spaced:after {
 	float: left;
 	margin-left: -30px;
 	color: #666;
+}
+
+.badge-subscript {
+	font-size: 80%;
+	position: relative;
+	top: 0.5em;
+	left: -0.5em;
+	padding: 0.1em 0.2em;
+	background-color: red !important;
+	animation: pulse 2s linear 0s normal infinite running;
+}
+.badge-hamburger {
+	position: absolute;
+	right: 0.1em;
+	bottom: 0.1em;
+	padding: 0.2em 0.4em;
+	background-color: red !important;
+	animation: pulse 2s linear 0s normal infinite running;
+}
+
+@keyframes pulse {
+	0%, 50% {
+		opacity: 1;
+	}
+	25% {
+		opacity: 0;
+	}
+}
+
+.dropdown-messages {
+	width: 310px;
+}
+.dropdown-messages div {
+	white-space: normal;
 }
 
 /* Large sizes */

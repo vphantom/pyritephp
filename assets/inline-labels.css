@@ -1,6 +1,6 @@
 div.input-block {
 	position: relative;
-	z-index: 9;
+	/* z-index: 9; */
 }
 
 div.input-block .input-error {
@@ -36,6 +36,9 @@ div.input-block .selectize-input, div.input-block .selectize-control.multi .sele
 	height: auto;
 }
 
+/* Reset to btn-sm for Summernote */
+div.input-block .note-toolbar .btn {
+	padding: 5px 10px;
 }
 
 /* Work around Chrome brute forcing yellow on autofill since 2008 */
