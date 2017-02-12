@@ -160,7 +160,7 @@ $().ready(function() {  // eslint-disable-line max-statements
     }
   );
   $('form.form-leftright button, form.form-tight button[type=submit]')
-    .not('.input-like button')
+    .not('.input-like button, .form-group button')
     .each(function() {
       $(this)
         .addClass('btn btn-default')
