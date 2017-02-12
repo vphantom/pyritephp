@@ -21,7 +21,7 @@ div.input-block label {
 	left: 16px;
 	z-index: 7;
 	margin: 6px;
-	font-size: 80%;
+	font-size: 11px;
 	color: #999;
 	font-weight: normal;
 }
@@ -48,4 +48,12 @@ div.input-block .note-toolbar .btn {
 :-webkit-autofill:active {
 	-webkit-transition: color 9999s ease-out, background-color 9999s ease-out;
 	-webkit-transition-delay: 9999s;
+}
+
+/* Play nice in a h2 .pull-right context */
+h2 div.input-block, h2 div.input-block label, h2 div.input-block .btn {
+	width: initial;
+}
+h2 div.input-block {
+	top: -5px;
 }
