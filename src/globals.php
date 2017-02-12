@@ -628,10 +628,12 @@ on(
         $req = grab('request');
         $id = array_shift($path);
         $email = null;
+        $emails = null;
+        $all = false;
         $sent = false;
         $success = false;
 
-        if ($id !== null) {
+        if (is_numeric($id)) {
             if (isset($req['post']['subject'])) {
                 $sent = true;
                 if (pass(
@@ -650,15 +652,22 @@ on(
             if (!$success) {
                 $email = grab('outbox_email', $id);
             };
+        } elseif ($id === 'all' && pass('has_role', 'admin')) {
+            $emails = grab('outbox', true);
+            $all = true;
+        } else {
+            $emails = $_SESSION['outbox'];
         };
 
         trigger(
             'render',
             'outbox.html',
             array(
-                'sent' => $sent,
+                'sent'    => $sent,
                 'success' => $success,
-                'email' => $email
+                'email'   => $email,
+                'emails'  => $emails,
+                'all'     => $all
             )
         );
     }

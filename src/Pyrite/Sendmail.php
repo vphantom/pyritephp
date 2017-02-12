@@ -104,7 +104,9 @@ class Sendmail
 
         $q = $db->query("SELECT id, sender, isSent, modified, datetime(modified, 'localtime') AS localmodified, recipients, ccs, bccs, subject FROM emails");
         $q->where('NOT isSent');
-        $q->and('sender = ?', $_SESSION['user']['id']);
+        if (!$all) {
+            $q->and('sender = ?', $_SESSION['user']['id']);
+        };
         $outbox = $db->selectArray($q);
         foreach ($outbox as $key => $email) {
             $roles = array();
@@ -125,7 +127,8 @@ class Sendmail
     /**
      * Fetch a single e-mail from user's outbox
      *
-     * The e-mail will only be returned if it was queued by the current user.
+     * The e-mail will only be returned if it was queued by the current user,
+     * unless the user has role 'admin'.
      *
      * @param int $id E-mail ID
      *
@@ -138,7 +141,9 @@ class Sendmail
 
         $q = $db->query("SELECT *, datetime(modified, 'localtime') AS localmodified FROM emails");
         $q->where('id = ?', $id);
-        $q->and('sender = ?', $_SESSION['user']['id']);
+        if (!pass('has_role', 'admin')) {
+            $q->and('sender = ?', $_SESSION['user']['id']);
+        };
         $email = $db->selectSingleArray($q);
         if ($email !== false) {
             foreach (array('recipients', 'ccs', 'bccs') as $col) {
@@ -182,7 +187,7 @@ class Sendmail
         };
 
         if ($id) {
-            $res = $db->update('emails', $cols, 'WHERE id=?', array($id));
+            $res = $db->update('emails', $cols, ", modified=datetime('now') WHERE id=?", array($id));
         } else {
             $res = $db->insert('emails', $cols);
         };
@@ -299,13 +304,15 @@ class Sendmail
      * A rudimentary text version will be derived from the HTML version in
      * order to build a proper 'multipart/alternative' attachment.
      *
-     * @param array|int $to       Destination userID(s)
-     * @param string    $template Template to load in 'templates/email/' (i.e. 'confirmlink')
-     * @param array     $args     Arguments to pass to template
+     * @param array|int      $to       Destination userID(s)
+     * @param array|int|null $cc       (Optional) Carbon-copy userIDs
+     * @param array|int|null $bcc      (Optional) Blind carbon-copy userIDs
+     * @param string         $template Template to load in 'templates/email/' (i.e. 'confirmlink')
+     * @param array          $args     Arguments to pass to template
      *
      * @return bool|int Whether sending succeeded, e-mail ID if one was created
      */
-    public static function send($to, $template, $args = array())
+    public static function send($to, $cc, $bcc, $template, $args = array())
     {
         global $PPHP;
 
@@ -314,12 +321,21 @@ class Sendmail
         if (!is_array($to)) {
             $to = array($to);
         };
+        if ($cc !== null && !is_array($cc)) {
+            $cc = array($cc);
+        };
+        if ($bcc !== null && !is_array($bcc)) {
+            $bcc = array($bcc);
+        };
 
         if (pass('can', 'edit', 'email')) {
             trigger('outbox_changed');
-            return self::setOutboxEmail(null, $to, null, null, $blocks['subject'], $blocks['html']);
+            return self::setOutboxEmail(null, $to, $cc, $bcc, $blocks['subject'], $blocks['html']);
         } else {
-            return self::_sendmail(self::_usersToRecipients($to), null, null, $blocks['subject'], $blocks['html']);
+            $to = self::_usersToRecipients($to);
+            $cc = self::_usersToRecipients($cc);
+            $bcc = self::_usersToRecipients($bcc);
+            return self::_sendmail($to, $cc, $bcc, $blocks['subject'], $blocks['html']);
         };
     }
 }
