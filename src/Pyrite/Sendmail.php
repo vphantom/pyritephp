@@ -311,10 +311,11 @@ class Sendmail
      * @param array|int|null $bcc      (Optional) Blind carbon-copy userIDs
      * @param string         $template Template to load in 'templates/email/' (i.e. 'confirmlink')
      * @param array          $args     Arguments to pass to template
+     * @param bool|null      $nodelay  (Optional) Set true to bypass outbox
      *
      * @return bool|int Whether sending succeeded, e-mail ID if one was created
      */
-    public static function send($to, $cc, $bcc, $template, $args = array())
+    public static function send($to, $cc, $bcc, $template, $args = array(), $nodelay = false)
     {
         global $PPHP;
 
@@ -330,7 +331,7 @@ class Sendmail
             $bcc = array($bcc);
         };
 
-        if (pass('can', 'edit', 'email')) {
+        if (pass('can', 'edit', 'email') && !$nodelay) {
             return self::setOutboxEmail(null, $to, $cc, $bcc, $blocks['subject'], $blocks['html']);
         } else {
             $to = self::_usersToRecipients($to);
