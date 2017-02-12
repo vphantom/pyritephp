@@ -111,7 +111,18 @@ class Filters
     public static function html2text($html)
     {
         $doc = new \DOMDocument();
-        $doc->loadHTML($html);
+
+        // Hack to force UTF-8 processing on incomplete documents
+        // From: http://php.net/manual/en/domdocument.loadhtml.php#95251
+        $doc->loadHTML('<?xml encoding="UTF-8">' . $html);
+        foreach ($doc->childNodes as $item) {
+            if ($item->nodeType == XML_PI_NODE) {
+                $doc->removeChild($item);  // Remove the hack we inserted above
+                break;  // We know there is only one
+            };
+        };
+        $doc->encoding = 'UTF-8';  // Proper way to set encoding
+
         return self::_dom2text($doc);
     }
 
