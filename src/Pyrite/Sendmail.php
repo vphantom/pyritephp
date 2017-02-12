@@ -36,12 +36,13 @@ class Sendmail
      */
     public static function bootstrap()
     {
-        on('install',      'Pyrite\Sendmail::install');
-        on('outbox',       'Pyrite\Sendmail::getOutbox');
-        on('outbox_email', 'Pyrite\Sendmail::getOutboxEmail');
-        on('outbox_save',  'Pyrite\Sendmail::setOutboxEmail');
-        on('outbox_send',  'Pyrite\Sendmail::sendOutboxEmail');
-        on('sendmail',     'Pyrite\Sendmail::send');
+        on('install',       'Pyrite\Sendmail::install');
+        on('outbox',        'Pyrite\Sendmail::getOutbox');
+        on('outbox_email',  'Pyrite\Sendmail::getOutboxEmail');
+        on('outbox_save',   'Pyrite\Sendmail::setOutboxEmail');
+        on('outbox_delete', 'Pyrite\Sendmail::deleteOutboxEmail');
+        on('outbox_send',   'Pyrite\Sendmail::sendOutboxEmail');
+        on('sendmail',      'Pyrite\Sendmail::send');
     }
 
     /**
@@ -194,6 +195,32 @@ class Sendmail
         };
 
         trigger('outbox_changed');
+        return $res;
+    }
+
+    /**
+     * Delete an e-mail from outbox
+     *
+     * Limited to the current user's messages, unless user has role 'admin' in
+     * which case all e-mails are fair game.
+     *
+     * @param int $id E-mail ID
+     *
+     * @return bool Whether the deletion was successful
+     */
+    public static function deleteOutboxEmail($id)
+    {
+        global $PPHP;
+        $db = $PPHP['db'];
+
+        $q = $db->query('DELETE FROM emails WHERE id=?', $id);
+        if (!pass('has_role', 'admin')) {
+            $q->and('sender=?', $_SESSION['user']['id']);
+        };
+        $res = $db->exec($q);
+        if ($res !== false) {
+            trigger('outbox_changed');
+        };
         return $res;
     }
 

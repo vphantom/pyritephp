@@ -672,10 +672,14 @@ on(
         $emails = null;
         $all = false;
         $sent = false;
+        $deleted = false;
         $success = false;
 
         if (is_numeric($id)) {
-            if (isset($req['post']['subject'])) {
+            if (isset($req['post']['delete'])) {
+                $deleted = true;
+                $success = trigger('outbox_delete', $id);
+            } elseif (isset($req['post']['subject'])) {
                 $sent = true;
                 if (pass(
                     'outbox_save',
@@ -706,6 +710,7 @@ on(
             'outbox.html',
             array(
                 'sent'    => $sent,
+                'deleted' => $deleted,
                 'success' => $success,
                 'email'   => $email,
                 'emails'  => $emails,
