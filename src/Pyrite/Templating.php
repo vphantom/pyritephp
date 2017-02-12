@@ -205,6 +205,8 @@ class Templating
             )
         );
 
+        $twig->addExtension(new \Twig_Extensions_Extension_Text());
+
         // Add debugging tools
         if ($PPHP['config']['global']['debug']) {
             $twig->addExtension(new \Twig_Extension_Debug());
