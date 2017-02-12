@@ -206,7 +206,9 @@ on(
                         $link = 'login?' . http_build_query(array( 'email' => $req['post']['email'], 'onetime' => $onetime));
                         trigger(
                             'sendmail',
-                            "{$user['name']} <{$req['post']['email']}>",
+                            $user['id'],
+                            null,
+                            null,
                             'confirmlink',
                             array(
                                 'validation_link' => $link
@@ -254,18 +256,25 @@ on(
             $saved = true;
             $oldEmail = filter('clean_email', $_SESSION['user']['email']);
             if (pass('login', $oldEmail, $req['post']['password'])) {
-                if ($success = pass('user_update', $_SESSION['user']['id'], $req['post'])) {
-                    $name = filter('clean_name', $_SESSION['user']['name']);
+                if (!pass('can', 'edit', 'email')) {
+                    // We can only warn the "before" e-mail in a no-queue scenario
                     trigger(
                         'sendmail',
-                        "{$name} <{$oldEmail}>",
+                        $_SESSION['user']['id'],
+                        null,
+                        null,
                         'editaccount'
                     );
+                };
+                if ($success = pass('user_update', $_SESSION['user']['id'], $req['post'])) {
+                    $name = filter('clean_name', $_SESSION['user']['name']);
                     $newEmail = $req['post']['email'];
                     if ($newEmail !== false  &&  $newEmail !== $oldEmail) {
                         trigger(
                             'sendmail',
-                            "{$name} <{$newEmail}>",
+                            $_SESSION['user']['id'],
+                            null,
+                            null,
                             'editaccount'
                         );
                     };
@@ -326,20 +335,26 @@ on(
             $req['post']['email'] = filter('clean_email', $req['post']['email']);
             $req['post']['name'] = filter('clean_name', $req['post']['name']);
             $req['post']['onetime'] = true;
-            if (($onetime = grab('user_create', $req['post'])) !== false) {
+            if (($newbie = grab('user_create', $req['post'])) !== false) {
+                $id = $newbie[0];
+                $onetime = $newbie[1];
                 $success = true;
                 trigger('http_status', 201);
                 if (pass('can', 'create', 'user')) {
                     trigger(
                         'sendmail',
-                        "{$req['post']['name']} <{$req['post']['email']}>",
+                        $id,
+                        null,
+                        null,
                         'invitation'
                     );
                 } else {
                     $link = 'login?' . http_build_query(array( 'email' => $req['post']['email'], 'onetime' => $onetime));
                     trigger(
                         'sendmail',
-                        "{$req['post']['name']} <{$req['post']['email']}>",
+                        $id,
+                        null,
+                        null,
                         'confirmlink',
                         array(
                             'validation_link' => $link
@@ -354,7 +369,9 @@ on(
                     $success = true;
                     trigger(
                         'sendmail',
-                        "{$user['name']} <{$user['email']}>",
+                        $user['id'],
+                        null,
+                        null,
                         'duplicate'
                     );
                 };
@@ -419,7 +436,9 @@ on(
                     $link = 'password_reset?' . http_build_query(array( 'email' => $req['post']['email'], 'onetime' => $onetime));
                     trigger(
                         'sendmail',
-                        "{$user['name']} <{$req['post']['email']}>",
+                        $user['id'],
+                        null,
+                        null,
                         'confirmlink',
                         array(
                             'validation_link' => $link

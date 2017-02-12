@@ -268,12 +268,15 @@ class Users
      * Special key 'password' is used to create 'passwordHash', instead of
      * being inserted directly.
      *
+     * On success, returns an array containing the new userID.  This is to
+     * make room for additional return values in certain circumstances.
+     *
      * If special key 'onetime' is present, it will trigger the generation of
-     * a one time password, which will be returned instead of the new user ID.
+     * a one time password, which will be added to the resulting array.
      *
      * @param array $cols Associative array of columns to set
      *
-     * @return string|bool|int New ID on success, false on failure
+     * @return array|bool Info on success, false on failure
      */
     public static function create($cols = array())
     {
@@ -313,7 +316,7 @@ class Users
             };
 
         };
-        return ($result && $onetime !== null) ? $onetime : $result;
+        return $result ? array($result, $onetime) : $result;
     }
 
     /**
@@ -427,7 +430,15 @@ class Users
                 $cols['email'] = $email;
                 $newbie = self::create($cols);
                 if ($newbie !== false) {
-                    $out[] = $newbie;
+                    $out[] = $newbie[0];
+                    trigger(
+                        'sendmail',
+                        $newbie,
+                        null,
+                        null,
+                        'invitation'
+                    );
+
                 };
 
             };
