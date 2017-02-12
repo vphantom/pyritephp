@@ -1,5 +1,10 @@
 /* Main styles */
 
+/* Override from Bootstrap's huge font choice */
+blockquote {
+	font-size: inherit !important;
+}
+
 .inline {
 	display: inline-block;
 }
