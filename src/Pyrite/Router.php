@@ -68,7 +68,7 @@ class Router
             as $key
         ) {
             if (array_key_exists($key, $_SERVER)) {
-                foreach (explode(',', $_SERVER[$key]) as $ip) {
+                foreach (dejoin(',', $_SERVER[$key]) as $ip) {
                     if (filter_var($ip, FILTER_VALIDATE_IP)) {
                         // Return the first one found
                         return $ip;
@@ -91,7 +91,7 @@ class Router
         self::$_req['status'] = 200;
         self::$_req['redirect'] = false;
         $parsedURL = parse_url($_SERVER['REQUEST_URI']);
-        self::$_PATH = explode('/', trim($parsedURL['path'], '/'));
+        self::$_PATH = dejoin('/', trim($parsedURL['path'], '/'));
         while (count(self::$_PATH) > 0 && self::$_PATH[0] === '') {
             array_shift(self::$_PATH);
         };

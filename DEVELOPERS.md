@@ -89,6 +89,13 @@ Not yet documented!
 Not yet documented!
 
 
+## Global Functions
+
+### dejoin(*$delim*, *$str*)
+
+Wrapper around PHP's `explode()` which takes care of returning an empty array when `$str` is empty or null.
+
+
 ## Templating
 
 Tempates use the [Twig template engine](http://twig.sensiolabs.org/).
@@ -97,7 +104,7 @@ All templates have variable `session` equivalent to `$_SESSION`, `config` which 
 
 Twig's `dump()` is always available and it is forcibly muted when `config.ini`'s `global.debug` is false.  It is therefore safe to leave some of those laying around.  For convenience, `debug()` prints all its arguments when debugging is true and nothing at all when it is false.
 
-PyritePHP adds an extra tag `{% exit %}` to ease in stopping templates partly through, say in an `{% if ... %}` condition for example.  This makes templates easier to read and manage than having large blocks of content indented (or worse: not indented, but still part of a big conditional section).
+PyritePHP adds an extra tag `{% exit %}` to ease in stopping templates partly through, for example in a condition.  This makes templates easier to read and manage than having large blocks of content indented (or worse: not indented, but still part of a big conditional section).
 
 ### Common variables
 
@@ -291,19 +298,19 @@ on('foo', 'MyClass::myStaticMethod');
 on('bar', function ($arg1, $arg2) { return $arg2; }, 1);
 ```
 
-#### trigger($event[, ...])
+#### trigger(*$event*[, ...])
 
 Calls all handlers registered for `$event`, with any additional arguments optionally passed in.  Returns an array of all the handlers' return values, in the order in which they were called.
 
-#### grab($event[, ...])
+#### grab(*$event*[, ...])
 
 Wrapper around `trigger()` which returns the _last_ return value of the handler chain.  This helps cases where events are used for the purpose of returning information.
 
-#### pass($event[, ...])
+#### pass(*$event*[, ...])
 
 Wrapper around `trigger()` which tests for the non-falsehood of its _last_ return value.  In other words, if any of the triggered event handlers returned false, which also stops propagation, then `pass()` will return false instead of `trigger()`'s array of all results.  This is great for validation purposes where all handlers should agree.
 
-#### filter($event, $value)
+#### filter(*$event*, $value)
 
 Sphido Events includes a WordPress-inspired filtering mechanism, where chains of handlers can modify input supplied to `filter()`.  This can be useful for formatting add-ons, currency conversion and such.  Note that `add_filter()` is just an alias for `on()`  Quoting the example straight from Sphido's documentation:
 

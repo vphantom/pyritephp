@@ -111,7 +111,7 @@ class Sendmail
         foreach ($outbox as $key => $email) {
             $roles = array();
             foreach (array('recipients', 'ccs', 'bccs') as $col) {
-                $outbox[$key][$col] = explode(';', $outbox[$key][$col]);
+                $outbox[$key][$col] = dejoin(';', $outbox[$key][$col]);
                 foreach ($outbox[$key][$col] as $uid) {
                     foreach (grab('user_roles', $uid) as $role) {
                         $roles[$role] = true;
@@ -147,7 +147,7 @@ class Sendmail
         $email = $db->selectSingleArray($q);
         if ($email !== false) {
             foreach (array('recipients', 'ccs', 'bccs') as $col) {
-                $email[$col] = explode(';', $email[$col]);
+                $email[$col] = dejoin(';', $email[$col]);
             };
         };
         return $email;
@@ -224,7 +224,7 @@ class Sendmail
             trigger(
                 'log',
                 array(
-                    'action' => 'send',
+                    'action' => 'sent',
                     'objectType' => 'email',
                     'objectId' => $id
                 )

@@ -17,6 +17,28 @@
 
 $GLOBALS['PPHP'] = array();
 
+// Supplements to PHP itself
+
+/**
+ * Split a string by delimiter
+ *
+ * Wrapper around PHP's `explode()` which takes care of returning an empty
+ * array when `$str` is empty, false or null.
+ *
+ * @param string      $delim Delimiter
+ * @param string|null $str   String to split
+ *
+ * @return array
+ */
+function dejoin($delim, $str)
+{
+    $out = array();
+    if (is_string($delim) && is_string($str) && strlen($str) > 0) {
+        $out = explode($delim, $str);
+    };
+    return $out;
+}
+
 // Supplements to sphido/event
 
 /**
