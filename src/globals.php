@@ -693,6 +693,7 @@ on(
             if (!$success) {
                 $email = grab('outbox_email', $id);
             };
+            $emails = $_SESSION['outbox'];
         } elseif ($id === 'all' && pass('has_role', 'admin')) {
             $emails = grab('outbox', true);
             $all = true;

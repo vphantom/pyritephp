@@ -175,6 +175,7 @@ class Sendmail
         };
 
         $cols = array(
+            'sender' => $_SESSION['user']['id'],
             'recipients' => implode(';', $to),
             'subject' => $subject,
             'html' => $html
@@ -192,6 +193,7 @@ class Sendmail
             $res = $db->insert('emails', $cols);
         };
 
+        trigger('outbox_changed');
         return $res;
     }
 
@@ -329,7 +331,6 @@ class Sendmail
         };
 
         if (pass('can', 'edit', 'email')) {
-            trigger('outbox_changed');
             return self::setOutboxEmail(null, $to, $cc, $bcc, $blocks['subject'], $blocks['html']);
         } else {
             $to = self::_usersToRecipients($to);
