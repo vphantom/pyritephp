@@ -131,6 +131,10 @@ class AuditTrail
             $userId = $_SESSION['user']['id'];
         };
 
+        // Enforce size limit on field values
+        $oldValue = substr($oldValue, 0, 250);
+        $newValue = substr($newValue, 0, 250);
+
         $db->exec(
             "
             INSERT INTO transactions
