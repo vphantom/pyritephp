@@ -10,6 +10,7 @@
 	],
 	"require": {
 		"php": ">=5.5",
+		"ext-dom": "*",
 		"ext-mbstring": "*",
 		"ext-mcrypt": "*",
 		"ext-pdo_sqlite": "*",
