@@ -492,6 +492,7 @@ on(
             $deleted = false;
             $success = false;
             $history = array();
+            $history_id = null;
             $user = array();
             $rights = array();
 
@@ -563,6 +564,7 @@ on(
                         'max' => 20
                     )
                 );
+                $history_id = $req['get']['id'];
                 $rights = grab('user_rights', $req['get']['id']);
                 $roles = grab('user_roles', $req['get']['id']);
             };
@@ -571,17 +573,19 @@ on(
                 'render',
                 'users_edit.html',
                 array(
-                    'actions'     => $PPHP['config']['acl']['actions'],
-                    'objectTypes' => $PPHP['config']['acl']['objectTypes'],
-                    'history'     => $history,
-                    'user'        => $user,
-                    'saved'       => $saved,
-                    'added'       => $added,
-                    'deleted'     => $deleted,
-                    'success'     => $success,
-                    'rights'      => $rights,
-                    'user_roles'  => $roles,
-                    'roles'       => $PPHP['config']['acl']['roles']
+                    'actions'      => $PPHP['config']['acl']['actions'],
+                    'objectTypes'  => $PPHP['config']['acl']['objectTypes'],
+                    'history'      => $history,
+                    'history_type' => 'user',
+                    'history_id'   => $history_id,
+                    'user'         => $user,
+                    'saved'        => $saved,
+                    'added'        => $added,
+                    'deleted'      => $deleted,
+                    'success'      => $success,
+                    'rights'       => $rights,
+                    'user_roles'   => $roles,
+                    'roles'        => $PPHP['config']['acl']['roles']
                 )
             );
             break;
