@@ -39,6 +39,56 @@ function dejoin($delim, $str)
     return $out;
 }
 
+/**
+ * Append indexed arrays to another
+ *
+ * @param array $dest       Destination array to modify
+ * @param array ...$sources Source arrays to append (one or many)
+ *
+ * @return array $dest itself
+ */
+// @codingStandardsIgnoreStart
+function array_merge_indexed(&$dest, ...$sources)
+{
+    // @codingStandardsIgnoreEnd
+    if (!is_array($dest)) {
+        return $dest;
+    };
+    foreach ($sources as $src) {
+        if (is_array($src)) {
+            foreach ($src as $v) {
+                $dest[] = $v;
+            };
+        };
+    };
+    return $dest;
+}
+
+/**
+ * Append associative arrays to another
+ *
+ * @param array $dest       Destination array to modify
+ * @param array ...$sources Source arrays to append (one or many)
+ *
+ * @return array $dest itself
+ */
+// @codingStandardsIgnoreStart
+function array_merge_assoc(&$dest, ...$sources)
+{
+    // @codingStandardsIgnoreEnd
+    if (!is_array($dest)) {
+        return $dest;
+    };
+    foreach ($sources as $src) {
+        if (is_array($src)) {
+            foreach ($src as $k => $v) {
+                $dest[$k] = $v;
+            };
+        };
+    };
+    return $dest;
+}
+
 // Supplements to sphido/event
 
 /**
