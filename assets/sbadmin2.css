@@ -1,0 +1,58 @@
+/* Additional dark panel contextual state classes */
+/* From: https://startbootstrap.com/template-overviews/sb-admin-2/ */
+.panel-green {
+  border-color: #5cb85c;
+}
+.panel-green > .panel-heading {
+  border-color: #5cb85c;
+  color: white;
+  background-color: #5cb85c;
+}
+.panel-green > a {
+  color: #5cb85c;
+}
+.panel-green > a:hover {
+  color: #3d8b3d;
+}
+.panel-red {
+  border-color: #d9534f;
+}
+.panel-red > .panel-heading {
+  border-color: #d9534f;
+  color: white;
+  background-color: #d9534f;
+}
+.panel-red > a {
+  color: #d9534f;
+}
+.panel-red > a:hover {
+  color: #b52b27;
+}
+.panel-orange {
+  border-color: #f7960e;
+}
+.panel-orange > .panel-heading {
+  border-color: #f7960e;
+  color: white;
+  background-color: #f7960e;
+}
+.panel-orange > a {
+  color: #f7960e;
+}
+.panel-orange > a:hover {
+  color: #df8a13;
+}
+.panel-yellow {
+  border-color: #e2dc1f;
+}
+.panel-yellow > .panel-heading {
+  border-color: #e2dc1f;
+  color: white;
+  background-color: #e2dc1f;
+}
+.panel-yellow > a {
+  color: #bfb90b;
+}
+.panel-yellow > a:hover {
+  color: #df8a13;
+}
