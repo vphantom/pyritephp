@@ -107,11 +107,11 @@ class Templating
 {
     private static $_twig;
     private static $_gettext;
-    private static $_title = '';
     private static $_status = 200;
     private static $_template;
     private static $_safeBody = '';
     private static $_lang = 'en';  // Could be '', paranoid precaution
+    private static $_stash = array();
 
     /**
      * Bootstrap: define event handlers
@@ -124,6 +124,7 @@ class Templating
         on('shutdown',      'Pyrite\Templating::shutdown', 1);
         on('render',        'Pyrite\Templating::render');
         on('render_blocks', 'Pyrite\Templating::renderBlocks');
+        on('set_env',       'Pyrite\Templating::setStash');
         on('title',         'Pyrite\Templating::title');
         on('http_status',   'Pyrite\Templating::status');
         on('language',      'Pyrite\Templating::setLang');
@@ -266,14 +267,15 @@ class Templating
             try {
                 self::$_template = $twig->loadTemplate('layout.html');
 
-                self::$_template->displayBlock(
-                    'head',
+                array_merge_assoc(
+                    self::$_stash,
                     array(
                         'config' => $PPHP['config'],
                         'session' => $_SESSION,
                         'req' => $req
                     )
                 );
+                self::$_template->displayBlock('head', self::$_stash);
             } catch (\Exception $e) {
                 echo $e->getMessage();
             };
@@ -296,10 +298,9 @@ class Templating
             $body = ob_get_contents();
             ob_end_clean();
             try {
-                self::$_template->displayBlock(
-                    'body',
+                array_merge_assoc(
+                    self::$_stash,
                     array(
-                        'title' => self::$_title,
                         'body' => self::$_safeBody,
                         'stdout' => $body,
                         'config' => $PPHP['config'],
@@ -307,6 +308,7 @@ class Templating
                         'req' => grab('request')
                     )
                 );
+                self::$_template->displayBlock('body', self::$_stash);
             } catch (\Exception $e) {
                 echo $e->getMessage();
             };
@@ -366,6 +368,19 @@ class Templating
     }
 
     /**
+     * Set a key in environment variables passed to templates
+     *
+     * @param string $key Variable name
+     * @param mixed  $val Any value
+     *
+     * @return null
+     */
+    public static function setStash($key, $val)
+    {
+        self::$_stash[$key] = $val;
+    }
+
+    /**
      * Prepend new section to page title
      *
      * @param string $prepend New section of title text
@@ -375,7 +390,12 @@ class Templating
      */
     public static function title($prepend, $sep = ' - ')
     {
-        self::$_title = $prepend . (self::$_title !== '' ? ($sep . self::$_title) : '');
+        self::$_stash['title'] = $prepend
+            . (
+                isset(self::$_stash['title'])
+                ? ($sep . self::$_stash['title'])
+                : ''
+            );
     }
 
     /**
@@ -390,17 +410,17 @@ class Templating
     {
         global $PPHP;
 
-        $env = array_merge(
+        array_merge_assoc(
+            self::$_stash,
             $args,
             array(
-                'title' => self::$_title,
                 'config' => $PPHP['config'],
                 'session' => $_SESSION,
                 'req' => grab('request')
             )
         );
         try {
-            self::$_safeBody .= self::$_twig->render($name, $env);
+            self::$_safeBody .= self::$_twig->render($name, self::$_stash);
         } catch (\Exception $e) {
             echo $e->getMessage();
         };
@@ -418,7 +438,8 @@ class Templating
     {
         global $PPHP;
 
-        $env = array_merge(
+        array_merge_assoc(
+            self::$_stash,
             $args,
             array(
                 'config' => $PPHP['config'],
@@ -428,10 +449,10 @@ class Templating
         );
         try {
             $template = self::$_twig->loadTemplate($name);
-            $blockNames = $template->getBlockNames($env);
+            $blockNames = $template->getBlockNames(self::$_stash);
             $results = array();
             foreach ($blockNames as $blockName) {
-                $results[$blockName] = $template->renderBlock($blockName, $env);
+                $results[$blockName] = $template->renderBlock($blockName, self::$_stash);
             };
         } catch (\Exception $e) {
             echo $e->getMessage();
