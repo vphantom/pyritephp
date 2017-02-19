@@ -386,7 +386,7 @@ $().ready(function() {  // eslint-disable-line max-statements
     },
     onOptionAdd: function(value, data) {
       var sel = this;
-      var form = $('#myModal form');
+      var form = $('#user-modal form');
 
       // Not much works unless we let Selectize finish first.
       setTimeout(function() {
@@ -394,10 +394,10 @@ $().ready(function() {  // eslint-disable-line max-statements
         form.find('select').prop('selectedIndex', 0);
         form.parsley().reset();
 
-        $('#myModal .modal-title .text').text(value);
-        $('#myModal input[name=email]').val(value);
+        $('#user-modal .modal-title .text').text(value);
+        $('#user-modal input[name=email]').val(value);
 
-        $('#myModal').modal({
+        $('#user-modal').modal({
           backdrop: 'static',
           keyboard: false,
           show    : true
@@ -412,10 +412,10 @@ $().ready(function() {  // eslint-disable-line max-statements
           350
         );
 
-        $('#myModal .modal-footer button').on('click', function() {
-          var outform = $($('#myModal').attr('data-appends'));
-          var outbase = $('#myModal').attr('data-append-base');
-          var outkey  = $('#myModal').attr('data-append-key');
+        $('#user-modal .modal-footer button').on('click', function() {
+          var outform = $(sel.$wrapper).closest('form');
+          var outbase = $('#user-modal').attr('data-append-base');
+          var outkey  = $('#user-modal').attr('data-append-key');
           var outdata = {};
 
           if (form.parsley().validate()) {
@@ -438,7 +438,7 @@ $().ready(function() {  // eslint-disable-line max-statements
 
             // Destroy the popover before its element disappears.
             // tag.popover('destroy');
-            $('#myModal').modal('hide');
+            $('#user-modal').modal('hide');
 
             // Force a refresh of our items where refreshItems() won't.
             // Thanks to: https://github.com/selectize/selectize.js/issues/1162

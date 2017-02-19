@@ -36,6 +36,11 @@ div.input-block .selectize-input, div.input-block .selectize-control.multi .sele
 	height: auto;
 }
 
+div.input-block .btn.no-label {
+	padding: 1em;
+	max-height: 3.5em;
+}
+
 /* Reset to btn-sm for Summernote */
 div.input-block .note-toolbar .btn {
 	padding: 5px 10px;
