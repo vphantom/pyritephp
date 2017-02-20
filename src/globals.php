@@ -145,7 +145,7 @@ class Pyrite
         $PPHP['dir'] = $dir;
 
         // Load configuration
-        $PPHP['config'] = parse_ini_file('config.ini', true);
+        $PPHP['config'] = parse_ini_file("{$dir}/var/config.ini", true);
 
         // Work around limitation of PHP's handling of true and false entries
         $PPHP['config']['global']['debug'] = (bool)$PPHP['config']['global']['debug'];
