@@ -308,6 +308,11 @@ class Sendmail
     private static function _usersToRecipients($users)
     {
         $out = array();
+
+        if (!is_array($users)) {
+            return null;
+        };
+
         foreach ($users as $id) {
             $user = grab('user_resolve', $id);
             if ($user !== false) {
