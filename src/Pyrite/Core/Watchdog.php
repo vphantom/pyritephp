@@ -91,7 +91,7 @@ class Watchdog
             $out .= "<pre>";
         }
         $out .= wordwrap(strip_tags($message), 76)."\n\n";
-        $info = Array(
+        @$info = Array(
             'Client IP'     => $_SERVER['REMOTE_ADDR'],
             'User agent'    => $_SERVER['HTTP_USER_AGENT'],
             'Accept'        => $_SERVER['HTTP_ACCEPT'],
