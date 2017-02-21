@@ -76,6 +76,7 @@ class Users
                 passwordHash VARCHAR(255) NOT NULL DEFAULT '*',
                 onetimeHash  VARCHAR(255) NOT NULL DEFAULT '*',
                 onetimeTime  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                onetimeMax   INTEGER NOT NULL DEFAULT '0',
                 {$customs}
                 name         VARCHAR(255) NOT NULL DEFAULT ''
             )
@@ -178,10 +179,13 @@ class Users
     {
         global $PPHP;
         $db = $PPHP['db'];
-        $onetimeMax = $PPHP['config']['global']['onetime_lifetime'] * 60;
+        $onetimeMaxLow  = $PPHP['config']['global']['onetime_lifetime'] * 60;
+        $onetimeMaxHigh = $PPHP['config']['global']['invite_lifetime'] * 24 * 3600;
 
         if (($user = self::fromEmail($email)) !== false) {
             if ($onetime !== '') {
+                // Make sure DB's onetimeMax is between our short onetime and long invite lifetimes.
+                $onetimeMax = min(max($onetimeMaxLow, $user['onetimeMax']), $onetimeMaxHigh);
                 if ($user['onetimeElapsed'] < $onetimeMax  &&  password_verify($onetime, $user['onetimeHash'])) {
                     // Invalidate immediately, don't wait for expiration
                     $db->update('users', array('onetimeHash' => '*'), 'WHERE id=?', array($user['id']));
@@ -208,7 +212,8 @@ class Users
      * of 'passwordHash'.
      *
      * Special key 'onetime' triggers the creation of a new onetime token and
-     * its 'onetimeHash', resets 'onetimeTime'.
+     * its 'onetimeHash', resets 'onetimeTime'.  If it contains a number, it
+     * will be set as the preferred expiration, in seconds.
      *
      * @param int   $id   ID of the user to update
      * @param array $cols Associative array of columns to update
@@ -243,6 +248,9 @@ class Users
             $ott = ", onetimeTime=datetime('now') ";
             $onetime = md5(mcrypt_create_iv(32, MCRYPT_DEV_URANDOM));
             $cols['onetimeHash'] = password_hash($onetime, PASSWORD_DEFAULT);
+            if (is_numeric($cols['onetime'])) {
+                $cols['onetimeMax'] = $cols['onetime'];
+            };
         };
         $result = $db->update(
             'users',
@@ -403,12 +411,16 @@ class Users
      * user is created with that address and supplemental columns found in
      * $userData[$email] in order to replace it with a freshly created userID.
      *
-     * @param array $list     Mixed list of numbers and e-mail addresses
-     * @param array $userData Extra columns for each user keyed by e-mail
+     * - If $template is defined, any created user gets e-mailed an invitation
+     * with a 'validation_link' present in that e-mail template.
+     *
+     * @param array       $list     Mixed list of numbers and e-mail addresses
+     * @param array       $userData Extra columns for each user keyed by e-mail
+     * @param string|null $template (Optional) Which template to e-mail new users
      *
      * @return array Clean list of valid userIDs
      */
-    public static function cleanList($list, $userData)
+    public static function cleanList($list, $userData, $template = null)
     {
         global $PPHP;
         $db = $PPHP['db'];
@@ -431,16 +443,10 @@ class Users
                 $newbie = self::create($cols);
                 if ($newbie !== false) {
                     $out[] = $newbie[0];
-                    trigger(
-                        'sendmail',
-                        $newbie,
-                        null,
-                        null,
-                        'invitation'
-                    );
-
+                    if ($template !== null) {
+                        trigger('send_invite', $template, $newbie[0]);
+                    };
                 };
-
             };
         };
 

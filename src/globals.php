@@ -384,32 +384,14 @@ on(
             $created = true;
             $req['post']['email'] = filter('clean_email', $req['post']['email']);
             $req['post']['name'] = filter('clean_name', $req['post']['name']);
-            $req['post']['onetime'] = true;
             if (($newbie = grab('user_create', $req['post'])) !== false) {
                 $id = $newbie[0];
-                $onetime = $newbie[1];
                 $success = true;
                 trigger('http_status', 201);
                 if (pass('can', 'create', 'user')) {
-                    trigger(
-                        'sendmail',
-                        $id,
-                        null,
-                        null,
-                        'invitation'
-                    );
+                    trigger('send_invite', 'invitation', $id);
                 } else {
-                    $link = 'login?' . http_build_query(array( 'email' => $req['post']['email'], 'onetime' => $onetime));
-                    trigger(
-                        'sendmail',
-                        $id,
-                        null,
-                        null,
-                        'confirmlink',
-                        array(
-                            'validation_link' => $link
-                        )
-                    );
+                    trigger('send_invite', 'confirmlink', $id);
                 };
             } else {
                 if (($user = grab('user_fromemail', $req['post']['email'])) !== false) {
@@ -793,5 +775,33 @@ on(
             return false;
         };
         return true;
+    }
+);
+
+on(
+    'send_invite',
+    /**
+     * Send invitation e-mail with onetime login link to user
+     *
+     * @param string      $template The template to e-mail
+     * @param int         $userId   The user to invite
+     * @param array|null  $args     Arguments to pass to template
+     * @param string|null $onetime  Don't generate onetime, use this one
+     *
+     * @return bool|int The result of event 'sendmail'
+     */
+    function ($template, $userId, $args = array(), $onetime = null) {
+        global $PPHP;
+        $config = $PPHP['config'];
+        if ($onetime === null) {
+            $onetime = grab('user_update', $userId, array('onetime' => $config['global']['invite_lifetime'] * 24 * 3600));
+        };
+        $user = grab('user_resolve', $userId);
+        if (!$user || !$onetime) {
+            return false;
+        };
+        $link = 'login?' . http_build_query(array( 'email' => $user['email'], 'onetime' => $onetime));
+        $args['validation_link'] = $link;
+        return grab('sendmail', $userId, null, null, $template, $args);
     }
 );
