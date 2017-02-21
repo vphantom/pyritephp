@@ -32,9 +32,9 @@
  * @category  Library
  * @package   PyritePHP
  * @author    Stéphane Lavergne <lis@imars.com>
- * @copyright 2008-2016 Stéphane Lavergne
+ * @copyright 2008-2017 Stéphane Lavergne
  * @license   https://opensource.org/licenses/MIT  MIT License
- * @link      https://github.com/vphantom/pyrite-php
+ * @link      https://github.com/vphantom/pyritephp
  */
 
 namespace Pyrite\Core;
@@ -49,7 +49,7 @@ namespace Pyrite\Core;
  * @category  Library
  * @package   Email
  * @author    Stéphane Lavergne <lis@imars.com>
- * @copyright 2008-2016 Stéphane Lavergne
+ * @copyright 2008-2017 Stéphane Lavergne
  * @license   https://opensource.org/licenses/MIT  MIT License
  * @link      https://github.com/vphantom/php-library
  */

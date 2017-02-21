@@ -12,7 +12,7 @@
  * @author    Stéphane Lavergne <lis@imars.com>
  * @copyright 2008-2017 Stéphane Lavergne
  * @license   https://opensource.org/licenses/MIT  MIT License
- * @link      https://github.com/vphantom/pyrite-php
+ * @link      https://github.com/vphantom/pyritephp
  */
 
 namespace Pyrite\Core;
@@ -29,7 +29,7 @@ namespace Pyrite\Core;
  * @author    Stéphane Lavergne <lis@imars.com>
  * @copyright 2008-2017 Stéphane Lavergne
  * @license   https://opensource.org/licenses/MIT  MIT License
- * @link      https://github.com/vphantom/pyrite-php
+ * @link      https://github.com/vphantom/pyritephp
  */
 
 class Filters

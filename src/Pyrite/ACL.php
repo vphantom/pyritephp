@@ -8,9 +8,9 @@
  * @category  Library
  * @package   PyritePHP
  * @author    Stéphane Lavergne <lis@imars.com>
- * @copyright 2016 Stéphane Lavergne
+ * @copyright 2016-2017 Stéphane Lavergne
  * @license   https://opensource.org/licenses/MIT  MIT
- * @link      https://github.com/vphantom/pyrite-php
+ * @link      https://github.com/vphantom/pyritephp
  */
 
 namespace Pyrite;
@@ -21,9 +21,9 @@ namespace Pyrite;
  * @category  Library
  * @package   PyritePHP
  * @author    Stéphane Lavergne <lis@imars.com>
- * @copyright 2016 Stéphane Lavergne
+ * @copyright 2016-2017 Stéphane Lavergne
  * @license   https://opensource.org/licenses/MIT  MIT
- * @link      https://github.com/vphantom/pyrite-php
+ * @link      https://github.com/vphantom/pyritephp
  */
 class ACL
 {
