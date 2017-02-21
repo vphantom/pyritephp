@@ -22,7 +22,7 @@ Just use this repo as your starting point, modify this file and the contents of 
 
 This framework was actually built as the starting point for a commercial project named "PyriteView" as a bilingual play on the words "Peer Review".  The framework was then forked on its own as it is highly generic.  The name "PyritePHP" then made sense, considering its origin.
 
-### Version 0.9.45
+### Version 0.9.56
 
 All the planned functionality is included, however some API design is still slightly in flux (i.e. some event vs class choices).  If you're looking to fork, this is probably a good enough starting point, however if you'd like future bug fixes and updates, you might want to wait for version 1.0.
 
@@ -50,6 +50,14 @@ Pyrite::run();
 
 // Shut down
 Pyrite::shutdown();
+```
+
+The above program will only load up and fire a single event if one is
+specified from the CLI.  Our example application's installation is launched
+with, for example:
+
+```sh
+$ php ./index.php --trigger install
 ```
 
 ### Automatically from our example application

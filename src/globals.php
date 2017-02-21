@@ -17,6 +17,44 @@
 
 $GLOBALS['PPHP'] = array();
 
+global $PPHP;
+
+$PPHP['version'] = 'v0.9.56-prerelease';
+
+$PPHP['license'] = <<<EOS
+PyritePHP {$PPHP['version']}
+Copyright (c) 2017 Stephane Lavergne <https://github.com/vphantom>
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+EOS;
+
+$PPHP['help'] = <<<EOS
+
+PyritePHP {$PPHP['version']}
+
+Valid options:
+
+-h, --help
+        This usage message.
+
+-V, --version
+        Current version information.
+
+-tevent, --trigger event
+        Trigger event and exit normally.
+
+        Built-in event "install" creates any missing database tables.
+
+
+EOS;
+
 // Supplements to PHP itself
 
 /**
@@ -123,9 +161,9 @@ function pass()
  * @category  Application
  * @package   PyritePHP
  * @author    Stéphane Lavergne <lis@imars.com>
- * @copyright 2016 Stéphane Lavergne
+ * @copyright 2016-2017 Stéphane Lavergne
  * @license   https://opensource.org/licenses/MIT  MIT
- * @link      https://github.com/vphantom/pyrite-php
+ * @link      https://github.com/vphantom/pyritephp
  */
 class Pyrite
 {
@@ -170,10 +208,34 @@ class Pyrite
             include_once $fname;
         };
 
-        // From the command line means install mode
+        // From the command line, don't do web startup
         if (php_sapi_name() === 'cli') {
-            trigger('install');
-            exit;
+            $options = getopt('hVt:', array('help', 'version', 'trigger:'));
+
+            if (isset($options['help']) || isset($options['h'])) {
+                echo $PPHP['help'];
+                exit;
+            };
+
+            if (isset($options['version']) || isset($options['V'])) {
+                echo $PPHP['license'];
+                exit;
+            };
+
+            $trigger = null;
+            if (isset($options['t'])) {
+                $trigger = $options['t'];
+            };
+            if (isset($options['trigger'])) {
+                $trigger = $options['trigger'];
+            };
+            if ($trigger !== null) {
+                trigger($trigger);
+                exit;
+            };
+
+            echo "Error: no action specified!\n";
+            exit(1);
         };
 
         // Start up
