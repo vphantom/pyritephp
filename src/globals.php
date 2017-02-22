@@ -783,8 +783,8 @@ on(
                     'outbox_save',
                     $id,
                     $req['post']['recipients'],
-                    $req['post']['ccs'],
-                    $req['post']['bccs'],
+                    (isset($req['post']['ccs']) ? $req['post']['ccs'] : null),
+                    (isset($req['post']['bccs']) ? $req['post']['bccs'] : null),
                     $req['post']['subject'],
                     $req['post']['html']
                 ) !== false
