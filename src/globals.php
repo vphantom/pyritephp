@@ -289,6 +289,15 @@ Pyrite\Users::bootstrap();
 // Framework-related routes
 
 on(
+    'install',
+    function () {
+        global $PPHP;
+        echo "\n    Don't forget to chmod/chgrp {$PPHP['config']['db']['sqlite_path']}!\n\n";
+    },
+    99
+);
+
+on(
     'route/page',
     function ($path) {
         $req = grab('request');
