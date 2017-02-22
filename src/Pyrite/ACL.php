@@ -356,7 +356,8 @@ class ACL
             );
         };
 
-        if (($userId !== null && $_SESSION['user']['id'] == $userId)
+        if (($userId !== null
+            && (isset($_SESSION['user']) && $_SESSION['user']['id'] == $userId))
             || ($role !== null && self::hasRole($role))
         ) {
             self::reload();
