@@ -112,7 +112,7 @@ class Watchdog
 
         $out .= "\nCGI PARAMETERS:\n";
         foreach ($_REQUEST as $name => $val) {
-            $out .= " {$name} = {$val}\n";
+            $out .= " {$name} = " . print_r($val, true) . "\n";
         }
 
         $stack = debug_backtrace();
