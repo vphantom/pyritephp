@@ -71,7 +71,14 @@ tbody.spaced:after {
 	color: #cc0000;
 }
 
-form label {
+html:not([lang="en"]) form label:first-letter,
+html:not([lang="en"]) .text-title:first-letter
+{
+	text-transform: uppercase;
+}
+html[lang="en"] form label,
+html[lang="en"] .text-title
+{
 	text-transform: capitalize;
 }
 

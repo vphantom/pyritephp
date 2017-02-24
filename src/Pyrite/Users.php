@@ -121,8 +121,8 @@ class Users
     /**
      * Resolve a user ID to basic information
      *
-     * Only id, active, name and email are included in this cached subset.
-     * Useful for display purposes.
+     * This is a cached resolver, useful for display purposes but not for
+     * fetching the most up to date user information.
      *
      * @param int $id User ID to resolve
      *
@@ -137,7 +137,7 @@ class Users
         };
 
         $db = $PPHP['db'];
-        if ($user = $db->selectSingleArray("SELECT id, active, name, email FROM users WHERE id=?", array($id))) {
+        if ($user = $db->selectSingleArray("SELECT * FROM users WHERE id=?", array($id))) {
             return self::$_resolved[$id] = $user;
         };
         return false;

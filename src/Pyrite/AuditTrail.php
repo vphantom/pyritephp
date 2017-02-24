@@ -34,10 +34,11 @@ class AuditTrail
      */
     public static function bootstrap()
     {
-        on('install',   'Pyrite\AuditTrail::install');
-        on('log',       'Pyrite\AuditTrail::add');
-        on('history',   'Pyrite\AuditTrail::get');
-        on('user_seen', 'Pyrite\AuditTrail::getLastLogin');
+        on('install',    'Pyrite\AuditTrail::install');
+        on('log',        'Pyrite\AuditTrail::add');
+        on('history',    'Pyrite\AuditTrail::get');
+        on('user_seen',  'Pyrite\AuditTrail::getLastLogin');
+        on('in_history', 'Pyrite\AuditTrail::getObjectIds');
     }
 
     /**
@@ -268,5 +269,37 @@ class AuditTrail
             )
         );
         return $last !== false ? $last : array('timestamp' => null, 'ip' => null);
+    }
+
+    /**
+     * Get IDs with activity present
+     *
+     * Get all objectIds of $objectType for which there is activity.  If
+     * $begin is specified, search period is restricted to transactions on and
+     * after that date.  If $end is also specified, search period is further
+     * restricted to end on that date, inclusively.
+     *
+     * @param string      $objectType Type of object to search for
+     * @param string|null $begin      ('YYYY-MM-DD') Earliest date to match
+     * @param string|null $end        ('YYYY-MM-DD') Last date to match
+     *
+     * @return array List of objectIds found
+     */
+    public static function getObjectIds($objectType, $begin = null, $end = null)
+    {
+        global $PPHP;
+        $db = $PPHP['db'];
+
+        $q = $db->query("SELECT DISTINCT(objectId) FROM transactions WHERE objectType=?", $objectType);
+        if ($begin !== null && $end !== null) {
+            $q->and("timestamp BETWEEN date(?) AND date(?, '+1 day')", array($begin, $end));
+        } elseif ($begin !== null) {
+            $q->and("timestamp >= date(?)", $begin);
+        } elseif ($end !== null) {
+            $q->and("timestamp <= date(?, '+1 day')", $end);
+        };
+        $q->order_by('objectId ASC');
+
+        return $db->selectList($q);
     }
 }
