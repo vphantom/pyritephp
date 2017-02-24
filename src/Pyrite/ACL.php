@@ -190,7 +190,7 @@ class ACL
         );
         self::_load($flat);
 
-        $_SESSION['user']['roles'] = self::getRoles($userId);
+        $_SESSION['ACL_ROLES'] = self::getRoles($userId);
     }
 
     /**
@@ -205,10 +205,10 @@ class ACL
         if (!isset($_SESSION['user'])) {
             return false;
         };
-        if (!array_key_exists('roles', $_SESSION['user'])) {
+        if (!isset($_SESSION['ACL_ROLES'])) {
             return false;
         };
-        return in_array($role, $_SESSION['user']['roles']);
+        return in_array($role, $_SESSION['ACL_ROLES']);
     }
 
     /**
@@ -391,7 +391,7 @@ class ACL
 
         if (($userId !== null
             && (isset($_SESSION['user']) && $_SESSION['user']['id'] == $userId))
-            || ($role !== null && self::hasRole($role))
+            || ($userId === null && $role !== null && self::hasRole($role))
         ) {
             self::reload();
         };
@@ -555,7 +555,7 @@ class ACL
         global $PPHP;
         $db = $PPHP['db'];
 
-        return $db->selectList(
+        $out = $db->selectList(
             "
             SELECT userId FROM users_roles
             WHERE role=?
@@ -563,6 +563,7 @@ class ACL
             ",
             array($role)
         );
+        return (is_array($out) ? $out : array());
     }
 
     /**
@@ -579,7 +580,7 @@ class ACL
         global $PPHP;
         $db = $PPHP['db'];
 
-        return $db->selectList(
+        $out = $db->selectList(
             "
             SELECT userId FROM acl_users
             WHERE action=? AND objectType=? AND objectId=?
@@ -591,6 +592,7 @@ class ACL
                 $objectId
             )
         );
+        return (is_array($out) ? $out : array());
     }
 
     /**
