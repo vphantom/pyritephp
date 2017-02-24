@@ -38,6 +38,7 @@ class ACL
         on('install',      'Pyrite\ACL::install');
         on('newuser',      'Pyrite\ACL::reload');
         on('can',          'Pyrite\ACL::can');
+        on('can_any',      'Pyrite\ACL::canAny');
         on('can_sql',      'Pyrite\ACL::sqlCondition');
         on('has_role',     'Pyrite\ACL::hasRole');
         on('grant',        'Pyrite\ACL::grant');
@@ -246,6 +247,36 @@ class ACL
             };
         };
 
+        return false;
+    }
+
+    /**
+     * Is the current user allowed any specific IDs for this action/type?
+     *
+     * @param string $action     Action to test
+     * @param string $objectType Class of object this applies to
+     *
+     * @return bool True if there are any explicit IDs for user or his role
+     */
+    public static function canAny($action, $objectType)
+    {
+        if (!isset($_SESSION['ACL_INFO'])) {
+            return false;
+        };
+        $acl = $_SESSION['ACL_INFO'];
+        foreach (array('*', $action) as $act) {
+            if (array_key_exists($act, $acl)) {
+                $acl2 = $acl[$act];
+                foreach (array('*', $objectType) as $typ) {
+                    if (array_key_exists($typ, $acl2)) {
+                        foreach ($acl2[$typ] as $id) {
+                            echo " MATCH({$act},{$typ},{$id}) ";
+                            return true;
+                        };
+                    };
+                };
+            };
+        };
         return false;
     }
 
