@@ -270,7 +270,6 @@ class ACL
                 foreach (array('*', $objectType) as $typ) {
                     if (array_key_exists($typ, $acl2)) {
                         foreach ($acl2[$typ] as $id) {
-                            echo " MATCH({$act},{$typ},{$id}) ";
                             return true;
                         };
                     };
