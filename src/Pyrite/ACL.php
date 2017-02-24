@@ -201,6 +201,9 @@ class ACL
      */
     public static function hasRole($role)
     {
+        if (!isset($_SESSION['user'])) {
+            return false;
+        };
         if (!array_key_exists('roles', $_SESSION['user'])) {
             return false;
         };
