@@ -180,10 +180,11 @@ class AuditTrail
      * @param string|null     $fieldName  Specific field affected
      * @param string|null     $order      Either 'DESC' or 'ASC'
      * @param int|null        $max        LIMIT rows returned
+     * @param bool|null       $today      Restrict to current day
      *
      * @return array List of associative arrays, one per entry
      */
-    public static function get($userId, $objectType = null, $objectId = null, $action = null, $fieldName = null, $order = 'ASC', $max = null)
+    public static function get($userId, $objectType = null, $objectId = null, $action = null, $fieldName = null, $order = 'ASC', $max = null, $today = false)
     {
         global $PPHP;
         $db = $PPHP['db'];
@@ -198,6 +199,10 @@ class AuditTrail
             if (isset($args['max'])) {
                 $max = $args['max'];
                 unset($args['max']);
+            };
+            if (isset($args['today'])) {
+                $today = $args['today'];
+                unset($args['today']);
             };
         } else {
             if ($userId !== null)     $args['userId']     = $userId;
@@ -230,6 +235,9 @@ class AuditTrail
                     $conditions[] = $db->query("{$key}=?", $val);
                 };
             };
+        };
+        if ($today) {
+            $conditions[] = $db->query("date(timestamp)=date('now')");
         };
         $query->implode('AND', $conditions)->order_by('id ' . $order);
         if ($max !== null) {
