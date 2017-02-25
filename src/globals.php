@@ -447,6 +447,8 @@ on(
 on(
     'route/register',
     function () {
+        global $PPHP;
+        $config = $PPHP['config'];
         $req = grab('request');
         $created = false;
         $success = false;
@@ -461,8 +463,13 @@ on(
                 trigger('http_status', 201);
                 if (pass('can', 'create', 'user')) {
                     trigger('send_invite', 'invitation', $id);
+                    $roles = preg_split('/[\s]+/', $config['acl']['invited_auto_roles']);
                 } else {
                     trigger('send_invite', 'confirmlink', $id);
+                    $roles = preg_split('/[\s]+/', $config['acl']['registered_auto_roles']);
+                };
+                foreach ($roles as $role) {
+                    trigger('grant', $id, $role);
                 };
             } else {
                 if (($user = grab('user_fromemail', $req['post']['email'])) !== false) {
