@@ -69,6 +69,7 @@ class Sendmail
                 bccs       VARCHAR(255) NOT NULL DEFAULT '',
                 subject    TEXT NOT NULL DEFAULT '',
                 html       TEXT NOT NULL DEFAULT '',
+                files      BLOB,
                 FOREIGN KEY(sender) REFERENCES users(id)
             )
             "
@@ -83,8 +84,6 @@ class Sendmail
      * Only e-mails which were queued by the current user will be returned
      * normally.  If the user is admin and $all is true, then the whole queue
      * is returned.
-     *
-     * Omitted from the resulting data is the 'html' column.
      *
      * Added to the resulting data is a 'roles' array of relevant role names
      * for each e-mail.  A relevant role is any of users present in
@@ -103,7 +102,7 @@ class Sendmail
         global $PPHP;
         $db = $PPHP['db'];
 
-        $q = $db->query("SELECT id, sender, isSent, modified, datetime(modified, 'localtime') AS localmodified, recipients, ccs, bccs, subject FROM emails");
+        $q = $db->query("SELECT *, datetime(modified, 'localtime') AS localmodified FROM emails");
         $q->where('NOT isSent');
         if (!$all) {
             $q->and('sender = ?', $_SESSION['user']['id']);
@@ -119,6 +118,7 @@ class Sendmail
                     };
                 };
             };
+            $outbox[$key]['files'] = json_decode($email['files']);
             unset($roles['admin'], $roles['member']);
             $outbox[$key]['roles'] = array_keys($roles);
         };
@@ -151,6 +151,7 @@ class Sendmail
                 $email[$col] = dejoin(';', $email[$col]);
             };
         };
+        $email['files'] = json_decode($email['files'], true);
         return $email;
     }
 
@@ -163,10 +164,11 @@ class Sendmail
      * @param array  $bcc     Blind carbon-copy userIDs
      * @param string $subject The subject line, ready to send
      * @param string $html    Rich text content, ready to send
+     * @param array  $files   (Optional) List of [name,bytes,type] associative arrays
      *
      * @return bool Whether the update was successful (possibly ID on success)
      */
-    public static function setOutboxEmail($id, $to, $cc, $bcc, $subject, $html)
+    public static function setOutboxEmail($id, $to, $cc, $bcc, $subject, $html, $files = null)
     {
         global $PPHP;
         $db = $PPHP['db'];
@@ -187,10 +189,19 @@ class Sendmail
         if (is_array($bcc)) {
             $cols['bccs'] = implode(';', $bcc);
         };
+        if (is_array($files)) {
+            $cols['files'] = json_encode($files);
+        };
 
         if ($id) {
+            if (is_array($files)) {
+                $cols['files'] = json_encode($files);
+            };
             $res = $db->update('emails', $cols, ", modified=datetime('now') WHERE id=?", array($id));
         } else {
+            if ($files === null) {
+                $cols['files'] = json_encode(array());
+            };
             $res = $db->insert('emails', $cols);
         };
 
@@ -247,8 +258,7 @@ class Sendmail
         $to = self::_usersToRecipients($email['recipients']);
         $cc = self::_usersToRecipients($email['ccs']);
         $bcc = self::_usersToRecipients($email['bccs']);
-        if (self::_sendmail($to, $cc, $bcc, $email['subject'], $email['html'])) {
-            $db->begin();
+        if (self::_sendmail($to, $cc, $bcc, $email['subject'], $email['html'], $email['files'])) {
             $db->update('emails', array('isSent' => true), 'WHERE id=?', array($id));
             trigger(
                 'log',
@@ -259,7 +269,6 @@ class Sendmail
                 )
             );
             trigger('outbox_changed');
-            $db->commit();
             return true;
         };
 
@@ -271,15 +280,18 @@ class Sendmail
      *
      * This is the utility function which invokes Pyrite\Core\Email per se.
      *
+     * Note that $file['path'] here is relative to the current document root.
+     *
      * @param string $to      Destination e-mail address(es) (or "Name <email"> combos)
      * @param string $cc      Carbon-copy addresses (set null or '' to avoid)
      * @param string $bcc     Blind carbon-copy addresses (null/'' to avoid)
      * @param string $subject The subject line
      * @param string $html    Rich text content
+     * @param array  $files   List of [path,name,bytes,type] associative arrays
      *
      * @return bool Whether it succeeded
      */
-    private static function _sendmail($to, $cc, $bcc, $subject, $html)
+    private static function _sendmail($to, $cc, $bcc, $subject, $html, $files = array())
     {
         global $PPHP;
 
@@ -295,6 +307,9 @@ class Sendmail
         $msg->from = $PPHP['config']['global']['mail_from'];
         $msg->subject = $subject;
         $msg->addTextHTML(filter('html_to_text', $html), $html);
+        foreach ($files as $file) {
+            $msg->addFile("{$PPHP['dir']}/{$file['path']}/{$file['name']}", $file['name'], $file['type']);
+        };
         return ($msg->send() === 0);
     }
 
@@ -343,11 +358,12 @@ class Sendmail
      * @param array|int|null $bcc      (Optional) Blind carbon-copy userIDs
      * @param string         $template Template to load in 'templates/email/' (i.e. 'confirmlink')
      * @param array          $args     Arguments to pass to template
+     * @param array          $files    (Optional) List of [name,bytes,type] associative arrays
      * @param bool|null      $nodelay  (Optional) Set true to bypass outbox
      *
      * @return bool|int Whether sending succeeded, e-mail ID if one was created
      */
-    public static function send($to, $cc, $bcc, $template, $args = array(), $nodelay = false)
+    public static function send($to, $cc, $bcc, $template, $args = array(), $files = array(), $nodelay = false)
     {
         global $PPHP;
 
@@ -364,12 +380,12 @@ class Sendmail
         };
 
         if (pass('can', 'edit', 'email') && !$nodelay) {
-            return self::setOutboxEmail(null, $to, $cc, $bcc, $blocks['subject'], $blocks['html']);
+            return self::setOutboxEmail(null, $to, $cc, $bcc, $blocks['subject'], $blocks['html'], $files);
         } else {
             $to = self::_usersToRecipients($to);
             $cc = self::_usersToRecipients($cc);
             $bcc = self::_usersToRecipients($bcc);
-            return self::_sendmail($to, $cc, $bcc, $blocks['subject'], $blocks['html']);
+            return self::_sendmail($to, $cc, $bcc, $blocks['subject'], $blocks['html'], $files);
         };
     }
 }

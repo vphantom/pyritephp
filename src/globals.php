@@ -881,6 +881,6 @@ on(
         };
         $link = 'login?' . http_build_query(array( 'email' => $user['email'], 'onetime' => $onetime));
         $args['validation_link'] = $link;
-        return grab('sendmail', $userId, null, null, $template, $args, $nodelay);
+        return grab('sendmail', $userId, null, null, $template, $args, array(), $nodelay);
     }
 );

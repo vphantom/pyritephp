@@ -326,17 +326,20 @@ class Email
      *
      * Note that the MIME type is automatically detected from the file itself.
      *
-     * @param string $filepath    Path on local file system
-     * @param string $displayname File name to suggest to user
+     * @param string      $filepath    Path on local file system
+     * @param string      $displayname File name to suggest to user
+     * @param string|null $mimetype    (Optional) MIME Type
      *
      * @return null
      */
-    public function addFile($filepath, $displayname)
+    public function addFile($filepath, $displayname, $mimetype = null)
     {
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
         $fileContents = file_get_contents($filepath);
-        $mimeType = $finfo->buffer($fileContents);
-        $this->addData($mimeType, $displayname, $fileContents);
+        if ($mimetype === null) {
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $mimetype = $finfo->buffer($fileContents);
+        }
+        $this->addData($mimetype, $displayname, $fileContents);
     }
 
     /**

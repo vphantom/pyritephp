@@ -157,6 +157,11 @@ html[lang="en"] .text-title
 	left: -100%;
 }
 
+/* Summernote tweaks */
+.note-editor.note-frame {
+	margin-bottom: 0 !important;
+}
+
 /* Selectize for users */
 .name_email_label {
 }
