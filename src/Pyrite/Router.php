@@ -40,11 +40,13 @@ class Router
      */
     public static function bootstrap()
     {
-        on('startup',       'Pyrite\Router::initRequest', 1);
-        on('startup',       'Pyrite\Router::startup', 50);
-        on('request',       'Pyrite\Router::getRequest');
-        on('http_status',   'Pyrite\Router::setStatus');
-        on('http_redirect', 'Pyrite\Router::setRedirect');
+        on('startup',           'Pyrite\Router::initRequest', 1);
+        on('startup',           'Pyrite\Router::startup', 50);
+        on('request',           'Pyrite\Router::getRequest');
+        on('http_status',       'Pyrite\Router::setStatus');
+        on('http_redirect',     'Pyrite\Router::setRedirect');
+        on('warning',           'Pyrite\Router::addWarning');
+        on('no_fatal_warnings', 'Pyrite\Router::checkNoFatalWarnings');
     }
 
     /**
@@ -88,6 +90,7 @@ class Router
     {
         global $PPHP;
 
+        self::$_req['warnings'] = array();
         self::$_req['status'] = 200;
         self::$_req['redirect'] = false;
         $parsedURL = parse_url($_SERVER['REQUEST_URI']);
@@ -254,5 +257,62 @@ class Router
     public static function setRedirect($url)
     {
         self::$_req['redirect'] = $url;
+    }
+
+    /**
+     * Add warning to the list
+     *
+     * Severity level should be one of:
+     *
+     * 3: success
+     * 2: info
+     * 1: warning
+     * 0: fatal
+     *
+     * Any other value will be replaced with 1.
+     *
+     * If $args is not an array, it will be used directly as a single argument
+     * for convenience.
+     *
+     * @param string     $code  Warning code string
+     * @param int|null   $level Lowest=worst severity level
+     * @param mixed|null $args  Optional list of arguments
+     *
+     * @return null
+     */
+    public static function addWarning($code, $level = 1, $args = null)
+    {
+        if ($args === null) {
+            // Callers may use null as well.
+            $args = array();
+        };
+        if (!is_array($args)) {
+            $args = array($args);
+        };
+        switch ($level) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+            break;
+        default:
+            $level = 1;
+        };
+        self::$_req['warnings'][] = array($level, $code, $args);
+    }
+
+    /**
+     * Check that there are no fatal warnings pending
+     *
+     * @return bool Returns true if NO fatal warnings are registered
+     */
+    public static function checkNoFatalWarnings()
+    {
+        foreach (self::$_req['warnings'] as $warning) {
+            if ($warning[0] == 0) {
+                return false;
+            };
+        };
+        return true;
     }
 }
