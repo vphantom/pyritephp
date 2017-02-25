@@ -280,16 +280,20 @@ $().ready(function() {  // eslint-disable-line max-statements
     plugins  : ['remove_button'],
     highlight: false
   });
-  $('select.keywords').selectize({
-    plugins     : ['remove_button'],
-    highlight   : false,
-    delimiter   : ';',
-    create      : true,
-    createOnBlur: true,
-    openOnFocus : false,
-    maxItems    : 6,
-    // Work around default template including the English word "Add"
-    render      : selectizeRender
+  $('select.keywords').each(function() {
+    var maxItems = $(this).attr('data-maxcount');
+
+    $(this).selectize({
+      plugins     : ['remove_button'],
+      highlight   : false,
+      delimiter   : ';',
+      create      : true,
+      createOnBlur: true,
+      openOnFocus : false,
+      maxItems    : maxItems,
+      // Work around default template including the English word "Add"
+      render      : selectizeRender
+    });
   });
 
   /**
@@ -344,113 +348,129 @@ $().ready(function() {  // eslint-disable-line max-statements
       + (caption ? '<span class="email">' + escape(caption) + '</span>' : '')
       + '</div>';
   };
-  $('select.users').selectize({
-    plugins  : ['remove_button'],
-    highlight: false,
-    persist  : false,
-    render   : selectizeRender
+  $('select.users').each(function() {
+    var maxItems = $(this).attr('data-maxcount');
+
+    if (maxItems === undefined) {
+      maxItems = null;
+    }
+    $(this).selectize({
+      plugins  : ['remove_button'],
+      highlight: false,
+      persist  : false,
+      maxItems : maxItems,
+      render   : selectizeRender
+    });
   });
 
   // Creating users
-  $('select.users-create').selectize({
-    plugins     : ['remove_button'],
-    highlight   : false,
-    createOnBlur: true,
-    persist     : false,
-    render      : selectizeRender,
-    createFilter: function(input) {
-      return regexEMail.test(input) || input.match(regexNameEMail) !== null;
-    },
-    create: function(input) {
-      var match = input.match(regexNameEMail);
-      var opt = false;
+  $('select.users-create').each(function() {
+    var maxItems = $(this).attr('data-maxcount');
 
-      if (match !== null) {
-        opt = {
-          text : input,
-          value: match[2],
-          email: match[2],
-          name : match[1]
-        };
-      }
-      if (regexEMail.test(input)) {
-        opt = {
-          text : input,
-          value: input,
-          email: input,
-          name : null
-        };
-      }
-
-      return opt;
-    },
-    onOptionAdd: function(value, data) {
-      var sel = this;
-      var form = $('#user-modal form');
-
-      // Not much works unless we let Selectize finish first.
-      setTimeout(function() {
-        form.find('input').val(null);
-        form.find('select').prop('selectedIndex', 0);
-        form.parsley().reset();
-
-        $('#user-modal .modal-title .text').text(value);
-        $('#user-modal input[name=email]').val(value);
-
-        $('#user-modal').modal({
-          backdrop: 'static',
-          keyboard: false,
-          show    : true
-        });
-        setTimeout(
-          function() {
-            form
-              .find('input:visible, select:visible')
-              .first()
-              .focus();
-          },
-          350
-        );
-
-        $('#user-modal .modal-footer button').on('click', function() {
-          var outform = $(sel.$wrapper).closest('form');
-          var outbase = $('#user-modal').attr('data-append-base');
-          var outkey  = $('#user-modal').attr('data-append-key');
-          var outdata = {};
-
-          if (form.parsley().validate()) {
-            $(this).off('click');
-            form.serializeArray().forEach(function(item) {
-              outdata[item.name] = item.value;
-            });
-            outkey = outdata[outkey];
-
-            data['name'] = outdata['name'];
-
-            Object.keys(outdata).forEach(function(key) {
-              outform.append(
-                $('<input />')
-                  .attr('type', 'hidden')
-                  .attr('name', outbase + '[' + outkey + '][' + key + ']')
-                  .attr('value', outdata[key])
-              );
-            });
-
-            // Destroy the popover before its element disappears.
-            // tag.popover('destroy');
-            $('#user-modal').modal('hide');
-
-            // Force a refresh of our items where refreshItems() won't.
-            // Thanks to: https://github.com/selectize/selectize.js/issues/1162
-            // sel.clearCache();
-            sel.updateOption(value, sel.options[value]);
-
-            // Work around strange bug which reopens the select after creation
-            sel.close();
-          }
-        });
-      });
+    if (maxItems === undefined) {
+      maxItems = null;
     }
+    $(this).selectize({
+      plugins     : ['remove_button'],
+      highlight   : false,
+      createOnBlur: true,
+      persist     : false,
+      maxItems    : maxItems,
+      render      : selectizeRender,
+      createFilter: function(input) {
+        return regexEMail.test(input) || input.match(regexNameEMail) !== null;
+      },
+      create: function(input) {
+        var match = input.match(regexNameEMail);
+        var opt = false;
+
+        if (match !== null) {
+          opt = {
+            text : input,
+            value: match[2],
+            email: match[2],
+            name : match[1]
+          };
+        }
+        if (regexEMail.test(input)) {
+          opt = {
+            text : input,
+            value: input,
+            email: input,
+            name : null
+          };
+        }
+
+        return opt;
+      },
+      onOptionAdd: function(value, data) {
+        var sel = this;
+        var form = $('#user-modal form');
+
+        // Not much works unless we let Selectize finish first.
+        setTimeout(function() {
+          form.find('input').val(null);
+          form.find('select').prop('selectedIndex', 0);
+          form.parsley().reset();
+
+          $('#user-modal .modal-title .text').text(value);
+          $('#user-modal input[name=email]').val(value);
+
+          $('#user-modal').modal({
+            backdrop: 'static',
+            keyboard: false,
+            show    : true
+          });
+          setTimeout(
+            function() {
+              form
+                .find('input:visible, select:visible')
+                .first()
+                .focus();
+            },
+            350
+          );
+
+          $('#user-modal .modal-footer button').on('click', function() {
+            var outform = $(sel.$wrapper).closest('form');
+            var outbase = $('#user-modal').attr('data-append-base');
+            var outkey  = $('#user-modal').attr('data-append-key');
+            var outdata = {};
+
+            if (form.parsley().validate()) {
+              $(this).off('click');
+              form.serializeArray().forEach(function(item) {
+                outdata[item.name] = item.value;
+              });
+              outkey = outdata[outkey];
+
+              data['name'] = outdata['name'];
+
+              Object.keys(outdata).forEach(function(key) {
+                outform.append(
+                  $('<input />')
+                    .attr('type', 'hidden')
+                    .attr('name', outbase + '[' + outkey + '][' + key + ']')
+                    .attr('value', outdata[key])
+                );
+              });
+
+              // Destroy the popover before its element disappears.
+              // tag.popover('destroy');
+              $('#user-modal').modal('hide');
+
+              // Force a refresh of our items where refreshItems() won't.
+              // Thanks: https://github.com/selectize/selectize.js/issues/1162
+              // sel.clearCache();
+              sel.updateOption(value, sel.options[value]);
+
+              // Work around strange bug which reopens the select after creation
+              sel.close();
+            }
+          });
+        });
+      }
+    });
   });
 
   // Set parsley to found language instead of last loaded
