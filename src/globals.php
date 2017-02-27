@@ -463,10 +463,10 @@ on(
                 trigger('http_status', 201);
                 if (pass('can', 'create', 'user')) {
                     trigger('send_invite', 'invitation', $id);
-                    $roles = preg_split('/[\s]+/', $config['acl']['invited_auto_roles']);
+                    $roles = preg_split('/[\s]+/', $config['acl']['invited_auto_roles'], null, PREG_SPLIT_NO_EMPTY);
                 } else {
                     trigger('send_invite', 'confirmlink', $id);
-                    $roles = preg_split('/[\s]+/', $config['acl']['registered_auto_roles']);
+                    $roles = preg_split('/[\s]+/', $config['acl']['registered_auto_roles'], null, PREG_SPLIT_NO_EMPTY);
                 };
                 foreach ($roles as $role) {
                     trigger('grant', $id, $role);
