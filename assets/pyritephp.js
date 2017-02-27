@@ -68,6 +68,16 @@ $().ready(function() {  // eslint-disable-line max-statements
       });
   });
 
+  // Inputs which shouldn't trigger form submission
+  $('.no-submit').on('keypress keydown keyup', function(ev) {
+    if (ev.which === 13) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      return false;
+    }
+    return true;
+  });
+
   // Bootstrap-ize forms before enabling Parsley on them
 
   // LARGE FORMS
