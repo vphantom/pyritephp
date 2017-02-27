@@ -56,9 +56,9 @@ div.input-block .note-toolbar .btn {
 }
 
 /* Play nice in a h2 .pull-right context */
-h2 div.input-block, h2 div.input-block label, h2 div.input-block .btn {
-	width: initial;
-}
 h2 div.input-block {
 	top: -5px;
+}
+h2 div.input-block label {
+	left: 2px !important;
 }
