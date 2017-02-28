@@ -19,7 +19,7 @@ $GLOBALS['PPHP'] = array();
 
 global $PPHP;
 
-$PPHP['version'] = 'v1.0.1';
+$PPHP['version'] = 'v1.0.2';
 
 $PPHP['license'] = <<<EOS
 PyritePHP {$PPHP['version']}
