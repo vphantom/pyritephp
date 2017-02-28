@@ -107,6 +107,27 @@ class Email
     }
 
     /**
+     * Extract e-mail from possible name-email combo
+     *
+     * @param string $email Possibly dirty e-mail address
+     *
+     * @return string Cleaned up address, "" on failure
+     */
+    protected function undressEmail($email)
+    {
+        $matches = array();
+        preg_match('/^[^<]*?((<([^@]+@[^>]+)>)|([^@\s]+@\S+))\s*$/', $email, $matches);
+        if (is_array($matches)) {
+            if (!empty($matches[3])) {
+                return $matches[3];
+            } elseif (!empty($matches[4])) {
+                return $matches[4];
+            };
+        };
+        return '';
+    }
+
+    /**
      * Attempt Q and B encodings, returns shortest with preference for Q.
      *
      * @param string $s String to encode
@@ -433,7 +454,12 @@ class Email
     public function send()
     {
         $result = false;
-        if ($fp = popen(ini_get('sendmail_path'), 'w')) {
+        $from = $this->undressEmail($this->envelope['from']);
+        $path = ini_get('sendmail_path');
+        if (!empty($from)) {
+            $path .= " -f{$from}";
+        };
+        if ($fp = popen($path, 'w')) {
             fwrite($fp, $this->build());
             $result = pclose($fp);
         };
