@@ -3,8 +3,8 @@ php:
    - 7.0
 
 before_script:
-   - wget http://getcomposer.org/composer.phar
-   - php composer.phar install --dev --no-interaction
+   - travis_retry wget http://getcomposer.org/composer.phar
+   - travis_retry php composer.phar install --dev --no-interaction
 
 script:
    - php vendor/bin/phpunit --whitelist src --test-suffix=.php --coverage-clover build/logs/clover.xml test
