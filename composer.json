@@ -19,7 +19,8 @@
 		"twig/twig": "~2.1",
 		"twig/extensions": "~1.4",
 		"gettext/gettext": "~4.2",
-		"sphido/events": "^0.3.0"
+		"sphido/events": "^0.3.0",
+		"vphantom/email": "^1.0"
 	},
 	"require-dev": {
 		"ext-xdebug": "^2.0",

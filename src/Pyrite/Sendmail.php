@@ -278,7 +278,7 @@ class Sendmail
     /**
      * Actually send an e-mail
      *
-     * This is the utility function which invokes Pyrite\Core\Email per se.
+     * This is the utility function which invokes Email() per se.
      *
      * Note that $file['path'] here is relative to the current document root.
      *
@@ -295,7 +295,7 @@ class Sendmail
     {
         global $PPHP;
 
-        $msg = new \Pyrite\Core\Email();
+        $msg = new \Email();
         $msg->X_Mailer_Info = 'PyritePHP v1.0';
         $msg->to = $to;
         if ($cc && $cc !== '') {
