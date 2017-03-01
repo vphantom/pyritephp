@@ -11,5 +11,5 @@ script:
    - php vendor/bin/phpunit --whitelist src --test-suffix=.php --coverage-clover build/logs/clover.xml test
 
 after_script:
-   - travis_retry php coveralls -v
+   - travis_retry php vendor/bin/coveralls -v
 
