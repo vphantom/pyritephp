@@ -12,3 +12,4 @@ script:
 
 after_script:
    - travis_retry php coveralls -v
+
