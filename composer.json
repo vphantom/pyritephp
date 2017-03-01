@@ -22,7 +22,7 @@
 		"sphido/events": "^0.3.0"
 	},
 	"require-dev": {
-		"ext-xdebug": "~2.5",
+		"ext-xdebug": "^2.0",
 		"phpunit/phpunit": "^6.0",
 		"satooshi/php-coveralls": "^1.0"
 	},
