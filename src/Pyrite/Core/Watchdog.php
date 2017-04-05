@@ -51,7 +51,7 @@ class Watchdog
         // Remove E_NOTICE if you don't want to be _insanely_ picky.
         set_error_handler(
             array(&$this, 'handler'),
-            E_WARNING | E_USER_ERROR | E_USER_WARNING | E_USER_NOTICE | E_NOTICE
+            E_WARNING | E_USER_ERROR | E_USER_WARNING
         );
     }
 
