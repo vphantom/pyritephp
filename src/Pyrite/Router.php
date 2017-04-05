@@ -41,6 +41,7 @@ class Router
     public static function bootstrap()
     {
         on('startup',           'Pyrite\Router::initRequest', 1);
+        on('cli_startup',       'Pyrite\Router::initCLI', 1);
         on('startup',           'Pyrite\Router::startup', 50);
         on('request',           'Pyrite\Router::getRequest');
         on('http_status',       'Pyrite\Router::setStatus');
@@ -82,6 +83,49 @@ class Router
     }
 
     /**
+     * Initialization common to CLI and web
+     *
+     * @return null
+     */
+    private static function _initCommon()
+    {
+        global $PPHP;
+
+        self::$_req['warnings'] = array();
+        self::$_req['status'] = 200;
+        self::$_req['redirect'] = false;
+        self::$_req['protocol'] = (self::$_req['ssl'] ? 'https' : 'http');
+    }
+
+    /**
+     * Initialize request for CLI runs
+     *
+     * @return null
+     */
+    public static function initCLI()
+    {
+        global $PPHP;
+
+        self::$_PATH = array();
+        self::$_req['lang']         = $PPHP['config']['global']['default_lang'];
+        self::$_req['default_lang'] = $PPHP['config']['global']['default_lang'];
+        self::$_req['base'] = '';
+        self::$_req['binary'] = true;  // Keep layout template quiet
+        self::$_req['path'] = '';
+        self::$_req['query'] = '';
+        self::$_req['host'] = $PPHP['config']['global']['host'];
+        self::$_req['remote_addr'] = '127.0.0.1';
+        self::$_req['ssl'] = $PPHP['config']['global']['use_ssl'];
+        self::$_req['get'] = array();
+        self::$_req['post'] = array();
+        self::$_req['path_args'] = array();
+
+        self::_initCommon();
+
+        trigger('language', self::$_req['lang']);
+    }
+
+    /**
      * Start populating request details
      *
      * @return null
@@ -90,9 +134,6 @@ class Router
     {
         global $PPHP;
 
-        self::$_req['warnings'] = array();
-        self::$_req['status'] = 200;
-        self::$_req['redirect'] = false;
         $parsedURL = parse_url($_SERVER['REQUEST_URI']);
         self::$_PATH = dejoin('/', trim($parsedURL['path'], '/'));
         while (count(self::$_PATH) > 0 && self::$_PATH[0] === '') {
@@ -131,7 +172,6 @@ class Router
                 ||
                 (isset($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on')
             );
-        self::$_req['protocol'] = (self::$_req['ssl'] ? 'https' : 'http');
         self::$_req['get'] = $_GET;
         self::$_req['post'] = $_POST;
 
@@ -161,6 +201,8 @@ class Router
             };
             finfo_close($finfo);
         };
+
+        self::_initCommon();
     }
 
     /**

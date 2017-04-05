@@ -36,6 +36,7 @@ class Session
     public static function bootstrap()
     {
         on('startup',        'Pyrite\Session::startup', 10);
+        on('cli_startup',    'Pyrite\Session::startupCLI', 10);
         on('shutdown',       'Pyrite\Session::shutdown', 99);
         on('login',          'Pyrite\Session::login', 1);
         on('logout',         'Pyrite\Session::reset', 1);
@@ -72,6 +73,19 @@ class Session
         $magic .= $req['remote_addr'];
 
         return md5($magic);
+    }
+
+    /**
+     * Mock session for CLI
+     *
+     * @return null
+     */
+    public static function startupCLI()
+    {
+        global $PPHP;
+
+        $GLOBALS['_SESSION'] = array();
+        $GLOBALS['_SESSION']['user'] = array('id' => 0);
     }
 
     /**

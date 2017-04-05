@@ -188,6 +188,7 @@ class Pyrite
         // Work around limitation of PHP's handling of true and false entries
         $PPHP['config']['global']['debug'] = (bool)$PPHP['config']['global']['debug'];
         $PPHP['config']['global']['production'] = (bool)$PPHP['config']['global']['production'];
+        $PPHP['config']['global']['use_ssl'] = (bool)$PPHP['config']['global']['use_ssl'];
         $PPHP['config']['global']['force_outbox'] = (bool)$PPHP['config']['global']['force_outbox'];
 
         // Pass project's global __DIR__ a.k.a. document root
@@ -222,6 +223,9 @@ class Pyrite
                 exit;
             };
 
+            // CLI start up
+            trigger('cli_startup');
+
             $trigger = null;
             if (isset($options['t'])) {
                 $trigger = $options['t'];
@@ -238,7 +242,7 @@ class Pyrite
             exit(1);
         };
 
-        // Start up
+        // Web start up
         trigger('startup');
         if (array_key_exists('name', $PPHP['config']['global'])) {
             trigger('title', $PPHP['config']['global']['name']);

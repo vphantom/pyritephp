@@ -121,6 +121,7 @@ class Templating
     public static function bootstrap()
     {
         on('startup',       'Pyrite\Templating::startup', 99);
+        on('cli_startup',   'Pyrite\Templating::startup', 99);
         on('shutdown',      'Pyrite\Templating::shutdown', 1);
         on('render',        'Pyrite\Templating::render');
         on('render_blocks', 'Pyrite\Templating::renderBlocks');
@@ -436,7 +437,7 @@ class Templating
      */
     public static function renderBlocks($name, $args = array())
     {
-        global $PPHP;
+        global $PPHP, $_SESSION;
 
         array_merge_assoc(
             self::$_stash,
