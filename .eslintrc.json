@@ -35,7 +35,7 @@
     "linebreak-style": [ 2, "unix" ],
     "max-depth": 2,
     "complexity": 1,
-    "max-len": 1,
+    "max-len": [1, {"code": 80, "ignoreTrailingComments": true, "ignoreUrls": true, "ignoreRegExpLiterals": true}],
     "max-nested-callbacks": 1,
     "max-statements": [ 2, 25 ],
     "max-statements-per-line": 1,
