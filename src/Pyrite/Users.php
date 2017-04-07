@@ -274,7 +274,7 @@ class Users
      * If an 'id' key is present in $cols, it is silently ignored.
      *
      * Special key 'password' is used to create 'passwordHash', instead of
-     * being inserted directly.
+     * being inserted directly.  Key 'token' is synonymous with 'password'.
      *
      * On success, returns an array containing the new userID.  This is to
      * make room for additional return values in certain circumstances.
@@ -296,6 +296,9 @@ class Users
             unset($cols['id']);
         };
 
+        if (isset($cols['token']) && strlen($cols['token']) > 0) {
+            $cols['password'] = $cols['token'];
+        };
         if (isset($cols['password']) && strlen($cols['password']) > 0) {
             $cols['passwordHash'] = password_hash($cols['password'], PASSWORD_DEFAULT);
             // Else passwordHash will be '*' per table definition

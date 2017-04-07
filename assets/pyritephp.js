@@ -77,6 +77,12 @@ $().ready(function() {  // eslint-disable-line max-statements
       });
   });
 
+  // Password fields that become that way after DOM loaded
+  // (Works around LastPass for fresh registration forms.)
+  setTimeout(function() {
+    $('input.input-password').attr('type', 'password');
+  }, 5000);
+
   // Inputs which shouldn't trigger form submission
   $('.no-submit').on('keypress keydown keyup', function(ev) {
     if (ev.which === 13) {
