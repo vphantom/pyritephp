@@ -90,7 +90,7 @@ class Users
         );
         if (!$db->selectAtom("SELECT id FROM users WHERE id='1'")) {
             echo "Creating admin user...\n";
-            $email = readline("E-mail address: ");
+            $email = strtolower(readline("E-mail address: "));
             $pass1 = true;
             $pass2 = false;
             while ($pass1 !== $pass2) {
@@ -155,6 +155,8 @@ class Users
     {
         global $PPHP;
         $db = $PPHP['db'];
+
+        $email = strtolower($email);
         $isActive = ($active ? ' AND active ' : '');
         if ($user = $db->selectSingleArray(self::$_selectFrom . " WHERE email=? {$isActive}", array($email))) {
             return $user;
@@ -296,6 +298,7 @@ class Users
             unset($cols['id']);
         };
 
+        $cols['email'] = strtolower($cols['email']);
         if (isset($cols['token']) && strlen($cols['token']) > 0) {
             $cols['password'] = $cols['token'];
         };
@@ -355,7 +358,7 @@ class Users
         // Keyword matching
         if ($keyword !== null) {
             $search = array();
-            $search[] = $db->query('email LIKE ?', "%{$keyword}%");
+            $search[] = $db->query('email LIKE ?', strtolower("%{$keyword}%"));
             $search[] = $db->query('name LIKE ?', "%{$keyword}%");
             $search[] = $db->query('profession LIKE ?', "%{$keyword}%");
             $search[] = $db->query('employer LIKE ?', "%{$keyword}%");
@@ -427,6 +430,8 @@ class Users
     {
         global $PPHP;
         $db = $PPHP['db'];
+
+        $list = array_map('strtolower', $list);
 
         $db->begin();
 

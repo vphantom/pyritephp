@@ -253,7 +253,7 @@ Global variable `$PPHP['db']` is available with an instance of the `PDB` wrapper
 
 ## User
 
-Note that the first three columns defined in our example `modules/user.php` should remain intact: we need a unique ID and we expect to identify users by e-mail address and password, which itself is stored as a one-way hash in the database.
+Note that the first three columns defined in our example `modules/user.php` should remain intact: we need a unique ID and we expect to identify users by e-mail address (case-insensitive) and password, which itself is stored as a one-way hash in the database.
 
 
 ## Router
@@ -404,7 +404,7 @@ After the main content area of the current page is buffered, it is passed throug
 
 #### clean_email (*$address*)
 
-Sanitizes whatever characters shouldn't be in an e-mail address.
+Sanitizes whatever characters shouldn't be in an e-mail address and reduces to lowercase.
 
 #### clean_name (*$name*)
 

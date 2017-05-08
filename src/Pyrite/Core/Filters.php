@@ -55,7 +55,7 @@ class Filters
     }
 
     /**
-     * Sanitize e-mail address
+     * Sanitize and lowercase e-mail address
      *
      * @param string $email String to filter
      *
@@ -64,7 +64,7 @@ class Filters
     public static function cleanEmail($email)
     {
         // filter_var()'s FILTER_SANITIZE_EMAIL is way too permissive
-        return preg_replace('/[^a-zA-Z0-9@.,_+-]/', '', $email);
+        return strtolower(preg_replace('/[^a-zA-Z0-9@.,_+-]/', '', $email));
     }
 
     /**
