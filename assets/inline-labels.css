@@ -27,7 +27,8 @@ div.input-block label {
 }
 
 div.input-block input, div.input-block textarea, div.input-block select, div.input-block .btn,
-div.input-block .selectize-input, div.input-block .selectize-control.multi .selectize-input.has-items
+div.input-block .selectize-input, div.input-block .selectize-control.multi .selectize-input.has-items,
+div.input-block .input-like
 {
 	position: relative;
 	/* z-index: 10; */
