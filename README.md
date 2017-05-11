@@ -1,6 +1,6 @@
 # PyritePHP
 
-[![license](https://img.shields.io/github/license/vphantom/pyritephp.svg?style=plastic)]() [![GitHub release](https://img.shields.io/github/release/vphantom/pyritephp.svg?style=plastic)]() [![Build Status](https://travis-ci.org/vphantom/pyritephp.svg?branch=v1.1.0)](https://travis-ci.org/vphantom/pyritephp) [![Coverage Status](https://coveralls.io/repos/github/vphantom/pyritephp/badge.svg?branch=v1.1.0)](https://coveralls.io/github/vphantom/pyritephp?branch=v1.1.0)
+[![license](https://img.shields.io/github/license/vphantom/pyritephp.svg?style=plastic)]() [![GitHub release](https://img.shields.io/github/release/vphantom/pyritephp.svg?style=plastic)]() [![Build Status](https://travis-ci.org/vphantom/pyritephp.svg?branch=v1.2.0)](https://travis-ci.org/vphantom/pyritephp) [![Coverage Status](https://coveralls.io/repos/github/vphantom/pyritephp/badge.svg?branch=v1.2.0)](https://coveralls.io/github/vphantom/pyritephp?branch=v1.2.0)
 
 PHP 5 and Bootstrap 3 framework to kick-start multilingual web application development
 
