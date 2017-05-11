@@ -277,11 +277,12 @@ class Pyrite
     }
 }
 
-add_filter('clean_filename', 'Pyrite\Core\Filters::cleanFilename');
-add_filter('clean_email',    'Pyrite\Core\Filters::cleanEmail');
-add_filter('clean_name',     'Pyrite\Core\Filters::cleanName');
-add_filter('protect_email',  'Pyrite\Core\Filters::protectEmail');
-add_filter('html_to_text',   'Pyrite\Core\Filters::html2text');
+add_filter('clean_filename',     'Pyrite\Core\Filters::cleanFilename');
+add_filter('clean_basefilename', 'Pyrite\Core\Filters::cleanBaseFilename');
+add_filter('clean_email',        'Pyrite\Core\Filters::cleanEmail');
+add_filter('clean_name',         'Pyrite\Core\Filters::cleanName');
+add_filter('protect_email',      'Pyrite\Core\Filters::protectEmail');
+add_filter('html_to_text',       'Pyrite\Core\Filters::html2text');
 
 // Included modules which have start-up definitions
 Pyrite\ACL::bootstrap();
@@ -308,7 +309,7 @@ on(
     'route/page',
     function ($path) {
         $req = grab('request');
-        return trigger('render', 'pages/' . filter('clean_filename', $path[0]) . '.html');
+        return trigger('render', 'pages/' . filter('clean_basefilename', $path[0]) . '.html');
     }
 );
 

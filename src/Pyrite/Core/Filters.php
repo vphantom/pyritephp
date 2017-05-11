@@ -38,8 +38,6 @@ class Filters
     /**
      * Sanitize file name
      *
-     * This is for base file names: even dots are filtered out.
-     *
      * Spaces are reduced and translated into underscores.
      *
      * CAVEAT: does not allow accented characters, commas, and anything else
@@ -50,6 +48,21 @@ class Filters
      * @return string
      */
     public static function cleanFilename($name)
+    {
+        return preg_replace('/[^a-zA-Z0-9_.-]/', '', preg_replace('/\s+/', '_', $name));
+    }
+
+    /**
+     * Sanitize file name
+     *
+     * This is for BASE file names: in addition to the file name filter, this
+     * also removes dots.
+     *
+     * @param string $name String to filter
+     *
+     * @return string
+     */
+    public static function cleanBaseFilename($name)
     {
         return preg_replace('/[^a-zA-Z0-9_-]/', '', preg_replace('/\s+/', '_', $name));
     }
