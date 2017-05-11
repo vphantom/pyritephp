@@ -55,6 +55,9 @@ Valid options:
 
 EOS;
 
+$PPHP['contextType'] = null;
+$PPHP['contextId'] = null;
+
 // Supplements to PHP itself
 
 /**

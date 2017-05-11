@@ -127,6 +127,10 @@ class AuditTrail
                 $objectType = null;
             };
         };
+        if ($objectType === null && $objectId === null && $PPHP['contextType'] !== null && $PPHP['contextId'] !== null) {
+            $objectType = $PPHP['contextType'];
+            $objectId = $PPHP['contextId'];
+        };
 
         if ($userId === 0  &&  isset($_SESSION['user']['id'])) {
             $userId = $_SESSION['user']['id'];

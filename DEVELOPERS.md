@@ -246,6 +246,11 @@ Displayed when not logged in for any reason.
 Tied to `/user/prefs` to edit the current user's details.
 
 
+## Context
+
+You can set global `$PPHP['contextType']` and `$PPHP['contextId']` to describe your current context in the same sense you would for logging (see "Logging Events" below).  This is useful ahead of invoking components which themselves might trigger logging (for example, sending e-mails).
+
+
 ## Database
 
 Global variable `$PPHP['db']` is available with an instance of the `PDB` wrapper to `PDO`.  See [PDB documentation](lib/PDB.md).
