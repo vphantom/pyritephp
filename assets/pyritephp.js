@@ -60,7 +60,8 @@ $().ready(function() {  // eslint-disable-line max-statements
   };
   var locale = locales[lang];
 
-  var excludedInputs = 'input[type=button], input[type=submit], input[type=reset], input[type=hidden], .input-like input, .rich-edit';  // eslint-disable-line max-len
+  var excludedInputs = 'input[type=button], input[type=submit], input[type=reset], input[type=hidden], .rich-edit';  // eslint-disable-line max-len
+  var formExcludedInputs = excludedInputs + ', .input-like input';
 
   // A valid e-mail for us has: nospaces, '@', nospaces, '.', nospaces
   // Actual RFC822 implementations are pages long and wouldn't benefit us much.
@@ -107,7 +108,7 @@ $().ready(function() {  // eslint-disable-line max-statements
     ;
   });
   $('form.form-leftright > input, form.form-leftright > .btn-group, form.form-leftright > select, form.form-leftright > textarea, form.form-leftright > .input-like')  // eslint-disable-line max-len
-    .not(excludedInputs)
+    .not(formExcludedInputs)
     .each(function() {
       var id        = $(this).attr('id');
       var label     = $(this).attr('data-label');
@@ -148,7 +149,7 @@ $().ready(function() {  // eslint-disable-line max-statements
     }
   );
   $('form.form-tight input, form.form-tight select, form.form-tight textarea')
-    .not(excludedInputs)
+    .not(formExcludedInputs)
     .each(function() {
       var id      = $(this).attr('id');
       var label   = $(this).attr('data-label');
@@ -204,7 +205,7 @@ $().ready(function() {  // eslint-disable-line max-statements
     ;
   });
   $('form.form-compact input, form.form-compact select, form.form-compact textarea')  // eslint-disable-line max-len
-    .not(excludedInputs)
+    .not(formExcludedInputs)
     .each(function() {
       var id    = $(this).attr('id');
       var label = $(this).attr('data-label');
