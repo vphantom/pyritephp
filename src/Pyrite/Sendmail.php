@@ -3,7 +3,8 @@
 /**
  * Sendmail
  *
- * Send e-mails based on the Email class and templating events.
+ * Send e-mails based on the Email class and templating events, keeping a full
+ * copy archived.
  *
  * PHP version 5
  *
@@ -60,16 +61,18 @@ class Sendmail
         $db->exec(
             "
             CREATE TABLE IF NOT EXISTS 'emails' (
-                id         INTEGER PRIMARY KEY AUTOINCREMENT,
-                sender     INTEGER NOT NULL DEFAULT '0',
-                isSent     BOOL NOT NULL DEFAULT '0',
-                modified   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                recipients VARCHAR(255) NOT NULL DEFAULT '',
-                ccs        VARCHAR(255) NOT NULL DEFAULT '',
-                bccs       VARCHAR(255) NOT NULL DEFAULT '',
-                subject    TEXT NOT NULL DEFAULT '',
-                html       TEXT NOT NULL DEFAULT '',
-                files      BLOB,
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                sender      INTEGER NOT NULL DEFAULT '0',
+                isSent      BOOL NOT NULL DEFAULT '0',
+                modified    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                contextType VARCHAR(64) DEFAULT NULL,
+                contextId   INTEGER DEFAULT NULL,
+                recipients  VARCHAR(255) NOT NULL DEFAULT '',
+                ccs         VARCHAR(255) NOT NULL DEFAULT '',
+                bccs        VARCHAR(255) NOT NULL DEFAULT '',
+                subject     TEXT NOT NULL DEFAULT '',
+                html        TEXT NOT NULL DEFAULT '',
+                files       BLOB,
                 FOREIGN KEY(sender) REFERENCES users(id)
             )
             "
@@ -193,6 +196,9 @@ class Sendmail
             $cols['files'] = json_encode($files);
         };
 
+        $cols['contextType'] = $PPHP['contextType'];
+        $cols['contextId'] = $PPHP['contextId'];
+
         if ($id) {
             if (is_array($files)) {
                 $cols['files'] = json_encode($files);
@@ -238,11 +244,15 @@ class Sendmail
     /**
      * Send an e-mail from the user's outbox
      *
-     * @param int $id The e-mail ID
+     * Note that $tampered is TRUE by default to match v1.0.0 API where only
+     * messages spooled in manual outboxes were then sent with this function.
+     *
+     * @param int       $id       The e-mail ID
+     * @param bool|null $tampered Did it go through manual outbox?
      *
      * @return bool Whether it succeeded
      */
-    public static function sendOutboxEmail($id)
+    public static function sendOutboxEmail($id, $tampered = true)
     {
         global $PPHP;
         $db = $PPHP['db'];
@@ -250,6 +260,9 @@ class Sendmail
         $cc = null;
         $bcc = null;
 
+        if (!$id) {
+            return false;
+        };
         $email = self::getOutboxEmail($id);
         if (!$email) {
             return false;
@@ -260,14 +273,18 @@ class Sendmail
         $bcc = self::_usersToRecipients($email['bccs']);
         if (self::_sendmail($to, $cc, $bcc, $email['subject'], $email['html'], $email['files'])) {
             $db->update('emails', array('isSent' => true), 'WHERE id=?', array($id));
-            trigger(
-                'log',
-                array(
-                    'action' => 'sent',
-                    'objectType' => 'email',
-                    'objectId' => $id
-                )
+            $logData = array(
+                'action' => 'emailed',
+                'newValue' => $id
             );
+            if (!$tampered) {
+                $logData['userId'] = 0;
+            };
+            if ($email['contextType'] !== null && $email['contextId'] !== null) {
+                $logData['objectType'] = $email['contextType'];
+                $logData['objectId'] = $email['contextId'];
+            };
+            trigger('log', $logData);
             trigger('outbox_changed');
             return true;
         };
@@ -379,13 +396,11 @@ class Sendmail
             $bcc = array($bcc);
         };
 
+        $email = self::setOutboxEmail(null, $to, $cc, $bcc, $blocks['subject'], $blocks['html'], $files);
+
         if (pass('can', 'edit', 'email') && !$nodelay) {
-            return self::setOutboxEmail(null, $to, $cc, $bcc, $blocks['subject'], $blocks['html'], $files);
-        } else {
-            $to = self::_usersToRecipients($to);
-            $cc = self::_usersToRecipients($cc);
-            $bcc = self::_usersToRecipients($bcc);
-            return self::_sendmail($to, $cc, $bcc, $blocks['subject'], $blocks['html'], $files);
+            return $email;
         };
+        return self::sendOutboxEmail($email, false);
     }
 }
