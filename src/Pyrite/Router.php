@@ -180,6 +180,8 @@ class Router
                 foreach (self::$_req[$method]['__arrays'] as $key) {
                     if (!isset(self::$_req[$method][$key])) {
                         self::$_req[$method][$key] = array();
+                    } elseif (!is_array(self::$_req[$method][$key])) {
+                        self::$_req[$method][$key] = array(self::$_req[$method][$key]);
                     };
                 };
             };
