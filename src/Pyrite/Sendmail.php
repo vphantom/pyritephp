@@ -145,9 +145,6 @@ class Sendmail
 
         $q = $db->query("SELECT *, datetime(modified, 'localtime') AS localmodified FROM emails");
         $q->where('id = ?', $id);
-        if (!pass('has_role', 'admin')) {
-            $q->and('sender = ?', $_SESSION['user']['id']);
-        };
         $email = $db->selectSingleArray($q);
         if ($email !== false) {
             foreach (array('recipients', 'ccs', 'bccs') as $col) {
@@ -176,12 +173,12 @@ class Sendmail
         global $PPHP;
         $db = $PPHP['db'];
 
-        if (!pass('can', 'edit', 'email', $id)) {
-            return false;
+        $sender = 0;
+        if (isset($_SESSION['user']) && isset($_SESSION['user']['id'])) {
+            $sender = $_SESSION['user']['id'];
         };
-
         $cols = array(
-            'sender' => $_SESSION['user']['id'],
+            'sender' => $sender,
             'recipients' => implode(';', $to),
             'subject' => $subject,
             'html' => $html
@@ -200,9 +197,6 @@ class Sendmail
         $cols['contextId'] = $PPHP['contextId'];
 
         if ($id) {
-            if (is_array($files)) {
-                $cols['files'] = json_encode($files);
-            };
             $res = $db->update('emails', $cols, ", modified=datetime('now') WHERE id=?", array($id));
         } else {
             if ($files === null) {

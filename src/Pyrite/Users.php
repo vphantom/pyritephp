@@ -114,6 +114,22 @@ class Users
                 )
             );
         };
+        if (!$db->selectAtom("SELECT id FROM users WHERE id='0'")) {
+            // Yes it's auto-increment, but we need clean foreign keys and a
+            // default "system" to be 0.
+            $db->exec(
+                "
+                INSERT INTO users (id, active, email, name)
+                VALUES (?, ?, ?)
+                ",
+                array(
+                    0,
+                    0,
+                    '*',
+                    'System'
+                )
+            );
+        };
         $db->commit();
         echo "    done!\n";
     }
