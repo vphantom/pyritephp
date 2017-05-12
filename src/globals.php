@@ -193,6 +193,7 @@ class Pyrite
         $PPHP['config']['global']['production'] = (bool)$PPHP['config']['global']['production'];
         $PPHP['config']['global']['use_ssl'] = (bool)$PPHP['config']['global']['use_ssl'];
         $PPHP['config']['global']['force_outbox'] = (bool)$PPHP['config']['global']['force_outbox'];
+        $PPHP['config']['global']['onetime_multiple'] = (bool)$PPHP['config']['global']['onetime_multiple'];
 
         // Pass project's global __DIR__ a.k.a. document root
         $PPHP['config']['global']['docroot'] = $dir . '/';

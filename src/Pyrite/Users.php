@@ -205,8 +205,12 @@ class Users
                 // Make sure DB's onetimeMax is between our short onetime and long invite lifetimes.
                 $onetimeMax = min(max($onetimeMaxLow, $user['onetimeMax']), $onetimeMaxHigh);
                 if ($user['onetimeElapsed'] < $onetimeMax  &&  password_verify($onetime, $user['onetimeHash'])) {
+
                     // Invalidate immediately, don't wait for expiration
-                    $db->update('users', array('onetimeHash' => '*'), 'WHERE id=?', array($user['id']));
+                    if (!$PPHP['config']['global']['onetime_multiple']) {
+                        $db->update('users', array('onetimeHash' => '*'), 'WHERE id=?', array($user['id']));
+                    };
+
                     // Make sure user has role 'member' now that a onetime worked
                     trigger('grant', $user['id'], 'member');
                     return $user;
