@@ -63,9 +63,9 @@ class Session
         // HTTP_ACCEPT_ENCODING changes on Chrome 54 between GET and POST requests
         // HTTP_ACCEPT should change only in IE 6, so we'll tolerate it
         $magic
-            = $_SERVER['HTTP_ACCEPT_LANGUAGE']
-            . $_SERVER['HTTP_ACCEPT']
-            . $_SERVER['HTTP_USER_AGENT']
+            = (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '*')
+            . (isset($_SERVER['HTTP_ACCEPT']) ? $_SERVER['HTTP_ACCEPT'] : '*')
+            . (isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '*')
         ;
 
         // This is more sophisticated than just $_SERVER['REMOTE_ADDR']
