@@ -47,6 +47,7 @@ class Users
         on('ban_user',       'Pyrite\Users::ban');
         on('unban_user',     'Pyrite\Users::unban');
         on('clean_userids',  'Pyrite\Users::cleanList');
+        on('all_users',      'Pyrite\Users::listAll');
     }
 
     /**
@@ -481,5 +482,17 @@ class Users
         $db->commit();
 
         return $out;
+    }
+
+    /**
+     * List all active userIDs
+     *
+     * @return array List of active userIDs
+     */
+    public static function listAll()
+    {
+        global $PPHP;
+        $db = $PPHP['db'];
+        return $db->selectList('SELECT id FROM users WHERE active ORDER BY id ASC');
     }
 }
