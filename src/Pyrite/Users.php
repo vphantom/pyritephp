@@ -425,7 +425,7 @@ class Users
     }
 
     /**
-     * Resolve all items of a list into userIDs
+     * Resolve all items of a list into userIDs, preserving order
      *
      * - If an item is a valid active userID, it is left intact;
      *
@@ -456,24 +456,30 @@ class Users
 
         $db->begin();
 
-        $q = $db->query('SELECT id FROM users WHERE');
-        $q->append('id IN')->varsClosed($list);
-        $q->append('OR email IN')->varsClosed($list);
-        $out = $db->selectList($q);
-
-        foreach ($list as $email) {
-            if (preg_match('/^[^@ ]+@[^@ .]+\.[^@ ]+$/', $email) == 1) {
-                if (isset($userData[$email])) {
-                    $cols = $userData[$email];
-                } else {
-                    $cols = array();
+        $out = array();
+        foreach ($list as $id) {
+            if (is_numeric($id)) {
+                $cleanId = $db->selectAtom('SELECT id FROM users WHERE id=?', array($id));
+                if ($cleanId !== false) {
+                    $out[] = $cleanId;
                 };
-                $cols['email'] = $email;
-                $newbie = self::create($cols);
-                if ($newbie !== false) {
-                    $out[] = $newbie[0];
-                    if ($template !== null) {
-                        trigger('send_invite', $template, $newbie[0]);
+            } elseif (preg_match('/^[^@ ]+@[^@ .]+\.[^@ ]+$/', $email) == 1) {
+                $cleanId = $db->selectAtom('SELECT id FROM users WHERE email=?', array($id));
+                if ($cleanId !== false) {
+                    $out[] = $cleanId;
+                } else {
+                    if (isset($userData[$email])) {
+                        $cols = $userData[$email];
+                    } else {
+                        $cols = array();
+                    };
+                    $cols['email'] = $email;
+                    $newbie = self::create($cols);
+                    if ($newbie !== false) {
+                        $out[] = $newbie[0];
+                        if ($template !== null) {
+                            trigger('send_invite', $template, $newbie[0]);
+                        };
                     };
                 };
             };
