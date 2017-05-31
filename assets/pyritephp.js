@@ -5,6 +5,7 @@ var parsley = require('parsleyjs');
 var timeago = global.__timeago = require('timeago.js');
 var selectizeRender = {};
 
+require('jquery-ui-pyritephp');
 require('bootstrap');
 require('selectize');
 require('summernote');
@@ -303,14 +304,14 @@ $().ready(function() {  // eslint-disable-line max-statements
     }
   };
   $('select.advanced').selectize({
-    plugins  : ['remove_button'],
+    plugins  : ['remove_button', 'drag_drop'],
     highlight: false
   });
   $('select.keywords').each(function() {
     var maxItems = $(this).attr('data-maxcount');
 
     $(this).selectize({
-      plugins     : ['remove_button'],
+      plugins     : ['remove_button', 'drag_drop'],
       highlight   : false,
       delimiter   : ';',
       create      : true,
@@ -381,7 +382,7 @@ $().ready(function() {  // eslint-disable-line max-statements
       maxItems = null;
     }
     $(this).selectize({
-      plugins  : ['remove_button'],
+      plugins  : ['remove_button', 'drag_drop'],
       highlight: false,
       persist  : false,
       maxItems : maxItems,
@@ -397,7 +398,7 @@ $().ready(function() {  // eslint-disable-line max-statements
       maxItems = null;
     }
     $(this).selectize({
-      plugins     : ['remove_button'],
+      plugins     : ['remove_button', 'drag_drop'],
       highlight   : false,
       createOnBlur: true,
       persist     : false,
