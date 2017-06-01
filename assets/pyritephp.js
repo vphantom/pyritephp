@@ -331,6 +331,10 @@ $().ready(function() {  // eslint-disable-line max-statements
    * Conversely if 'email' is present but 'value' is not, then 'value' gets
    * the e-mail address.
    *
+   * Additional data attributes in the form of 'data-*' are also supported
+   * (elsewhere in this code), and saved as '*'.  (i.e. 'data-val-country'
+   * would be saved as 'valCountry')
+   *
    * @param {Object} item Data
    *
    * @return {Object} Formatted item
@@ -366,13 +370,31 @@ $().ready(function() {  // eslint-disable-line max-statements
   selectizeRender['option'] = function(item, escape) {
     var label;
     var caption;
+    var extras = '';
 
     item = itemToUser(item);
     label = item.name || item.email;
     caption = item.name ? item.email : null;
+
+    Object.keys(item).forEach(function(labelProp) {
+      var valProp;
+
+      valProp = labelProp.match(/^label(.*)$/);
+      if (valProp !== null) {
+        valProp = 'val' + valProp[1];
+        extras += '<span class="extra">'
+          + item[labelProp]
+          + ': '
+          + item[valProp]
+          + '</span>'
+        ;
+      }
+    });
+
     return '<div class="name_email_label">'
       + '<span class="name">' + escape(label) + '</span>'
       + (caption ? '<span class="email">' + escape(caption) + '</span>' : '')
+      + extras
       + '</div>';
   };
   $('select.users').each(function() {
@@ -404,6 +426,16 @@ $().ready(function() {  // eslint-disable-line max-statements
       persist     : false,
       maxItems    : maxItems,
       render      : selectizeRender,
+      onInitialize: function() {
+        var sel = this;
+
+        // Thanks to the following for this elegant solution to have HTML
+        // data-* attributes follow through to Selectize items:
+        // https://github.com/selectize/selectize.js/issues/239#issuecomment-73681922
+        this.revertSettings.$children.each(function() {
+          $.extend(sel.options[this.value], $(this).data());
+        });
+      },
       createFilter: function(input) {
         return regexEMail.test(input) || input.match(regexNameEMail) !== null;
       },

@@ -172,6 +172,11 @@ html[lang="en"] .text-title
 	color: #888;
 	display: block;
 }
+.name_email_label .extra {
+	color: #666;
+	display: block;
+	font-style: italic;
+}
 .name_email_tag {
 }
 .name_email_tag .name {
