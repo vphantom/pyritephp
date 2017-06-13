@@ -193,12 +193,13 @@ class Sendmail
             $cols['files'] = json_encode($files);
         };
 
-        $cols['contextType'] = $PPHP['contextType'];
-        $cols['contextId'] = $PPHP['contextId'];
-
         if ($id) {
             $res = $db->update('emails', $cols, ", modified=datetime('now') WHERE id=?", array($id));
         } else {
+            // Define context if we're creating a new e-mail
+            $cols['contextType'] = $PPHP['contextType'];
+            $cols['contextId'] = $PPHP['contextId'];
+
             if ($files === null) {
                 $cols['files'] = json_encode(array());
             };

@@ -465,8 +465,7 @@ class PDB
         if (is_array($values)) {
             foreach ($values as $key => $val) {
                 if (in_array($key, $colOK)) {
-                    // FIXME: $val needs to be an array right now?
-                    $cols[] = $this->query("{$key}=?", $val);
+                    $cols[] = $this->query("{$key}=?", array($val));  // Array to allow NULL
                 };
             };
         };
