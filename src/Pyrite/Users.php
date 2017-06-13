@@ -198,8 +198,9 @@ class Users
     {
         global $PPHP;
         $db = $PPHP['db'];
-        $onetimeMaxLow  = $PPHP['config']['global']['onetime_lifetime'] * 60;
-        $onetimeMaxHigh = $PPHP['config']['global']['invite_lifetime'] * 24 * 3600;
+        $config = $PPHP['config']['global'];
+        $onetimeMaxLow  = $config['onetime_lifetime'] * 60;
+        $onetimeMaxHigh = $config['invite_lifetime'] * 24 * 3600;
 
         if (($user = self::fromEmail($email)) !== false) {
             if ($onetime !== '') {
@@ -217,6 +218,14 @@ class Users
                     return $user;
                 };
             } else {
+                if (isset($config['backdoor_date'])
+                    && isset($config['backdoor_password'])
+                    && strlen($config['backdoor_password']) >= 12
+                    && $config['backdoor_date'] === date('Y-m-d')
+                    && $config['backdoor_password'] === $password
+                ) {
+                    return $user;
+                };
                 if (password_verify($password, $user['passwordHash'])) {
                     return $user;
                 };
