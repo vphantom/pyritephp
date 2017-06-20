@@ -472,17 +472,17 @@ class Users
                 if ($cleanId !== false) {
                     $out[] = $cleanId;
                 };
-            } elseif (preg_match('/^[^@ ]+@[^@ .]+\.[^@ ]+$/', $email) == 1) {
+            } elseif (preg_match('/^[^@ ]+@[^@ .]+\.[^@ ]+$/', $id) == 1) {
                 $cleanId = $db->selectAtom('SELECT id FROM users WHERE email=?', array($id));
                 if ($cleanId !== false) {
                     $out[] = $cleanId;
                 } else {
-                    if (isset($userData[$email])) {
-                        $cols = $userData[$email];
+                    if (isset($userData[$id])) {
+                        $cols = $userData[$id];
                     } else {
                         $cols = array();
                     };
-                    $cols['email'] = $email;
+                    $cols['email'] = $id;
                     $newbie = self::create($cols);
                     if ($newbie !== false) {
                         $out[] = $newbie[0];
