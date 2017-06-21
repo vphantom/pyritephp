@@ -36,6 +36,7 @@ class ACL
     public static function bootstrap()
     {
         on('install',      'Pyrite\ACL::install');
+        on('cli_startup',  'Pyrite\ACL::loadCLI', 20);
         on('newuser',      'Pyrite\ACL::reload');
         on('can',          'Pyrite\ACL::can');
         on('can_any',      'Pyrite\ACL::canAny');
@@ -152,6 +153,21 @@ class ACL
                 $_SESSION['ACL_INFO'][$row['action']][$row['objectType']][] = $row['objectId'];
             };
         };
+    }
+
+    /**
+     * Create admin in-memory rights tree for CLI sessions
+     *
+     * @return null
+     */
+    public static function loadCLI()
+    {
+        $_SESSION['ACL_INFO'] = array(
+            '*' => array(
+                '*' => array(0)
+            )
+        );
+        $_SESSION['ACL_ROLES'] = array('admin', 'member');
     }
 
     /**
