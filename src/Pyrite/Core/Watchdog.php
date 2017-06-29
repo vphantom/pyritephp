@@ -160,7 +160,6 @@ class Watchdog
             // Save bug report to file
             if ($this->_file) {
                 try {
-                    echo "TRYING TO SAVE TO FILE";
                     file_put_contents(
                         $this->_file,
                         "\n----- BEGIN CRASH REPORT -----\n    Timestamp: " . date('Y-m-d H:m:s O') . "\n    Source: {$_SERVER['PHP_SELF']}\n{$out}\n----- END CRASH REPORT -----\n",
