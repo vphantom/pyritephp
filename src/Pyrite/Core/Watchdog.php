@@ -48,11 +48,24 @@ class Watchdog
         ini_set('ignore_repeated_errors', true);
         $this->_tripped = false;
         $this->_email = null;
+        $this->_file = null;
         // Remove E_NOTICE if you don't want to be _insanely_ picky.
         set_error_handler(
             array(&$this, 'handler'),
             E_WARNING | E_USER_ERROR | E_USER_WARNING
         );
+    }
+
+    /**
+     * Enable saving to a log file
+     *
+     * @param string $path Path of the file to append to
+     *
+     * @return null
+     */
+    public function logfile($path)
+    {
+        $this->_file = $path;
     }
 
     /**
@@ -128,17 +141,36 @@ class Watchdog
                 . ")\n";
         }
         $out .= "\nFULL ENVIRONMENT:\n" . print_r($GLOBALS, true);
-        if ($this->_email) {
-            if ($this->_from) {
-                mail(
-                    $this->_email,
-                    "Error in {$_SERVER['PHP_SELF']}",
-                    $out,
-                    'From: ' . $this->_from
-                );
-            } else {
-                mail($this->_email, "Error in {$_SERVER['PHP_SELF']}", $out);
-            }
+        if ($this->_email || $this->_file) {
+
+            // E-mail bug report
+            if ($this->_email) {
+                if ($this->_from) {
+                    mail(
+                        $this->_email,
+                        "Error in {$_SERVER['PHP_SELF']}",
+                        $out,
+                        'From: ' . $this->_from
+                    );
+                } else {
+                    mail($this->_email, "Error in {$_SERVER['PHP_SELF']}", $out);
+                }
+            };
+
+            // Save bug report to file
+            if ($this->_file) {
+                try {
+                    echo "TRYING TO SAVE TO FILE";
+                    file_put_contents(
+                        $this->_file,
+                        "\n----- BEGIN CRASH REPORT -----\n    Timestamp: " . date('Y-m-d H:m:s O') . "\n    Source: {$_SERVER['PHP_SELF']}\n{$out}\n----- END CRASH REPORT -----\n",
+                        FILE_APPEND | LOCK_EX
+                    );
+                } catch (\Exception $e) {
+                };
+            };
+
+            // Terminate request, telling user that the error was logged.
             @header('Content-Type: text/html');
             echo "<p>It looks like an error occurred in our application.\n";
             echo "We're very sorry about that.  Details about the error\n";

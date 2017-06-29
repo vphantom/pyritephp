@@ -200,6 +200,9 @@ class Pyrite
 
         // Watchdog
         $watchdog = new Pyrite\Core\Watchdog();
+        if (array_key_exists('save_errors_in', $PPHP['config']['global'])) {
+            $watchdog->logfile($dir . '/' . $PPHP['config']['global']['save_errors_in']);
+        };
         if (array_key_exists('mail_errors_to', $PPHP['config']['global'])) {
             $watchdog->notify($PPHP['config']['global']['mail_errors_to']);
         };
