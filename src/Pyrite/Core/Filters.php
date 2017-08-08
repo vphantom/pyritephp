@@ -127,7 +127,7 @@ class Filters
 
         // Hack to force UTF-8 processing on incomplete documents
         // From: http://php.net/manual/en/domdocument.loadhtml.php#95251
-        $doc->loadHTML('<?xml encoding="UTF-8">' . $html);
+        $doc->loadHTML('<?xml encoding="UTF-8">' . $html, LIBXML_NOERROR | LIBXML_NOWARNING);
         foreach ($doc->childNodes as $item) {
             if ($item->nodeType == XML_PI_NODE) {
                 $doc->removeChild($item);  // Remove the hack we inserted above
