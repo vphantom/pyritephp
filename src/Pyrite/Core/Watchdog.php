@@ -162,7 +162,7 @@ class Watchdog
                 try {
                     file_put_contents(
                         $this->_file,
-                        "\n----- BEGIN CRASH REPORT -----\n    Timestamp: " . date('Y-m-d H:m:s O') . "\n    Source: {$_SERVER['PHP_SELF']}\n{$out}\n----- END CRASH REPORT -----\n",
+                        "\n----- BEGIN CRASH REPORT -----\n    Timestamp: " . date('Y-m-d H:i:s O') . "\n    Source: {$_SERVER['PHP_SELF']}\n{$out}\n----- END CRASH REPORT -----\n",
                         FILE_APPEND | LOCK_EX
                     );
                 } catch (\Exception $e) {
