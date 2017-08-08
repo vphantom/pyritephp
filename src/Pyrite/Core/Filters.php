@@ -123,6 +123,7 @@ class Filters
      */
     public static function html2text($html)
     {
+        libxml_use_internal_errors(true);
         $doc = new \DOMDocument();
 
         // Hack to force UTF-8 processing on incomplete documents
