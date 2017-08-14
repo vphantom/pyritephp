@@ -44,6 +44,7 @@ class Sendmail
         on('outbox_delete', 'Pyrite\Sendmail::deleteOutboxEmail');
         on('outbox_send',   'Pyrite\Sendmail::sendOutboxEmail');
         on('sendmail',      'Pyrite\Sendmail::send');
+        on('hourly',        'Pyrite\Sendmail::mailq');
     }
 
     /**
@@ -397,5 +398,28 @@ class Sendmail
             return $email;
         };
         return self::sendOutboxEmail($email, false);
+    }
+
+    /**
+     * Mail queue run
+     *
+     * Any unsent messages last modified more than 60 minutes ago, with no
+     * sender ('0') are sent because they were likely temporary failures.
+     *
+     * @return void
+     */
+    public static function mailq()
+    {
+        global $PPHP;
+        $db = $PPHP['db'];
+
+        $q = $db->query("SELECT id FROM emails");
+        $q->where('NOT isSent');
+        $q->and('sender = ?', 0);
+        $q->and("modified < datetime('now', '-1 hour')");
+        $queue = $db->selectList($q);
+        foreach ($queue as $emailId) {
+            self::sendOutboxEmail($email, false);
+        };
     }
 }
