@@ -135,6 +135,15 @@ mkdir sessions twig_cache
 chmod 6770 sessions twig_cache
 ```
 
+#### Crontab
+
+Trigger daily and hourly events with the same user as your web server:
+
+```crontab
+7	4	*	*	*	/usr/bin/php /web/your_site/index.php --trigger daily
+11	*	*	*	*	/usr/bin/php /web/your_site/index.php --trigger hourly
+```
+
 
 ## Updating
 

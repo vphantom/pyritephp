@@ -339,6 +339,14 @@ Below is a partial list of events present in PyritePHP and its demo/framework ap
 
 Invoked when `index.php` is executed from the command line.  Use this to confirm the existence of any database tables your module may need, for example.
 
+#### daily
+
+If configured as recommended, this event is fired from the command line exactly once per day.
+
+#### hourly
+
+If configured as recommended, this event is fired from the command line every hour.
+
 #### startup
 
 Invoked at the very start of the request process.  Used for initialization, for example session handling or loading any database data you are guaranteed to need regardless of request specifics.
