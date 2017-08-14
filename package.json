@@ -1,6 +1,6 @@
 {
   "name": "pyritephp",
-  "version": "1.2.14",
+  "version": "1.2.15",
   "description": "PHP/Bootstrap framework to kick-start multilingual web application development",
   "main": "assets/pyriteview.js",
   "directories": {
