@@ -419,7 +419,7 @@ class Sendmail
         $q->and("modified < datetime('now', '-1 hour')");
         $queue = $db->selectList($q);
         foreach ($queue as $emailId) {
-            self::sendOutboxEmail($email, false);
+            self::sendOutboxEmail($emailId, false);
         };
     }
 }
