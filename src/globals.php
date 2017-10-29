@@ -810,6 +810,7 @@ on(
                 if (pass(
                     'outbox_save',
                     $id,
+                    $req['post']['mailfrom'],
                     $req['post']['recipients'],
                     (isset($req['post']['ccs']) ? $req['post']['ccs'] : null),
                     (isset($req['post']['bccs']) ? $req['post']['bccs'] : null),

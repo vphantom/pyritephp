@@ -68,6 +68,7 @@ class Sendmail
                 modified    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 contextType VARCHAR(64) DEFAULT NULL,
                 contextId   INTEGER DEFAULT NULL,
+                mailfrom    INTEGER NOT NULL DEFAULT '0',
                 recipients  VARCHAR(255) NOT NULL DEFAULT '',
                 ccs         VARCHAR(255) NOT NULL DEFAULT '',
                 bccs        VARCHAR(255) NOT NULL DEFAULT '',
@@ -159,17 +160,18 @@ class Sendmail
     /**
      * Insert/update an outbox e-mail
      *
-     * @param int    $id      E-mail ID (null to create)
-     * @param array  $to      Destination userIDs
-     * @param array  $cc      Carbon-copy userIDs
-     * @param array  $bcc     Blind carbon-copy userIDs
-     * @param string $subject The subject line, ready to send
-     * @param string $html    Rich text content, ready to send
-     * @param array  $files   (Optional) List of [name,bytes,type] associative arrays
+     * @param int    $id       E-mail ID (null to create)
+     * @param int    $mailfrom Envelope sender
+     * @param array  $to       Destination userIDs
+     * @param array  $cc       Carbon-copy userIDs
+     * @param array  $bcc      Blind carbon-copy userIDs
+     * @param string $subject  The subject line, ready to send
+     * @param string $html     Rich text content, ready to send
+     * @param array  $files    (Optional) List of [name,bytes,type] associative arrays
      *
      * @return bool Whether the update was successful (possibly ID on success)
      */
-    public static function setOutboxEmail($id, $to, $cc, $bcc, $subject, $html, $files = null)
+    public static function setOutboxEmail($id, $mailfrom, $to, $cc, $bcc, $subject, $html, $files = null)
     {
         global $PPHP;
         $db = $PPHP['db'];
@@ -184,6 +186,9 @@ class Sendmail
             'subject' => $subject,
             'html' => $html
         );
+        if ($mailfrom) {
+                $cols['mailfrom'] = $mailfrom;
+        };
         if (is_array($cc)) {
             $cols['ccs'] = implode(';', $cc);
         };
@@ -253,6 +258,7 @@ class Sendmail
         global $PPHP;
         $db = $PPHP['db'];
 
+        $mailfrom = null;
         $cc = null;
         $bcc = null;
 
@@ -264,10 +270,13 @@ class Sendmail
             return false;
         };
 
+        if ($email['mailfrom']) {
+            $mailfrom = self::_usersToRecipients($email['mailfrom']);
+        };
         $to = self::_usersToRecipients($email['recipients']);
         $cc = self::_usersToRecipients($email['ccs']);
         $bcc = self::_usersToRecipients($email['bccs']);
-        if (self::_sendmail($to, $cc, $bcc, $email['subject'], $email['html'], $email['files'])) {
+        if (self::_sendmail($mailfrom, $to, $cc, $bcc, $email['subject'], $email['html'], $email['files'])) {
             $db->update('emails', array('isSent' => true), 'WHERE id=?', array($id));
             $logData = array(
                 'action' => 'emailed',
@@ -294,17 +303,20 @@ class Sendmail
      * This is the utility function which invokes Email() per se.
      *
      * Note that $file['path'] here is relative to the current document root.
+     * If $mailfrom is NULL, the default system sender from
+     * config.global.mail_from will be used.
      *
-     * @param string $to      Destination e-mail address(es) (or "Name <email"> combos)
-     * @param string $cc      Carbon-copy addresses (set null or '' to avoid)
-     * @param string $bcc     Blind carbon-copy addresses (null/'' to avoid)
-     * @param string $subject The subject line
-     * @param string $html    Rich text content
-     * @param array  $files   List of [path,name,bytes,type] associative arrays
+     * @param string $mailfrom Envelope sender
+     * @param string $to       Destination e-mail address(es) (or "Name <email"> combos)
+     * @param string $cc       Carbon-copy addresses (set null or '' to avoid)
+     * @param string $bcc      Blind carbon-copy addresses (null/'' to avoid)
+     * @param string $subject  The subject line
+     * @param string $html     Rich text content
+     * @param array  $files    List of [path,name,bytes,type] associative arrays
      *
      * @return bool Whether it succeeded
      */
-    private static function _sendmail($to, $cc, $bcc, $subject, $html, $files = array())
+    private static function _sendmail($mailfrom, $to, $cc, $bcc, $subject, $html, $files = array())
     {
         global $PPHP;
 
@@ -317,7 +329,11 @@ class Sendmail
         if ($bcc && $bcc !== '') {
             $msg->bcc = $bcc;
         };
-        $msg->from = $PPHP['config']['global']['mail_from'];
+        if ($mailfrom) {
+            $msg->from = $mailfrom;
+        } else {
+            $msg->from = $PPHP['config']['global']['mail_from'];
+        };
         $msg->subject = $subject;
         $msg->addTextHTML(filter('html_to_text', $html), $html);
         foreach ($files as $file) {
@@ -331,14 +347,14 @@ class Sendmail
      *
      * @param array $users List of userIDs
      *
-     * @return string The resulting string
+     * @return string The resulting string, null on failure
      */
     private static function _usersToRecipients($users)
     {
         $out = array();
 
         if (!is_array($users)) {
-            return null;
+            $users = array($users);
         };
 
         foreach ($users as $id) {
@@ -352,7 +368,7 @@ class Sendmail
             };
         };
 
-        return implode(', ', $out);
+        return (count($out) > 0) ? implode(', ', $out) : null;
     }
 
     /**
@@ -392,7 +408,7 @@ class Sendmail
             $bcc = array($bcc);
         };
 
-        $email = self::setOutboxEmail(null, $to, $cc, $bcc, $blocks['subject'], $blocks['html'], $files);
+        $email = self::setOutboxEmail(null, 0, $to, $cc, $bcc, $blocks['subject'], $blocks['html'], $files);
 
         if (pass('can', 'edit', 'email') && !$nodelay) {
             return $email;
