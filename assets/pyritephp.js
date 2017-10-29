@@ -8,7 +8,6 @@ var selectizeRender = {};
 require('jquery-ui-pyritephp');
 require('bootstrap');
 require('selectize');
-require('summernote');
 
 // Polyfill for MSIE
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger
@@ -24,42 +23,6 @@ $().ready(function() {  // eslint-disable-line max-statements
   // Get language code from HTML tag
   // (Default is just in case we miss it.  It _should_ always be set.)
   var lang = $('html').attr('lang') || 'en';
-  var locales = {
-    ar: 'ar-AR',
-    bg: 'bg-BG',
-    ca: 'ca-ES',
-    cs: 'cs-CZ',
-    da: 'da-DK',
-    de: 'de-DE',
-    es: 'es-ES',
-    fa: 'fa-IR',
-    fi: 'fi-FI',
-    fr: 'fr-FR',
-    gl: 'gl-ES',
-    he: 'he-IL',
-    hr: 'hr-HR',
-    hu: 'hu-HU',
-    id: 'id-ID',
-    it: 'it-IT',
-    ja: 'ja-JP',
-    ko: 'ko-KR',
-    lt: 'lt-LT',
-    nb: 'nb-NO',
-    nl: 'nl-NL',
-    pl: 'pl-PL',
-    pt: 'pt-PT',
-    ro: 'ro-RO',
-    ru: 'ru-RU',
-    sk: 'sk-SK',
-    sl: 'sl-SI',
-    sv: 'sv-SE',
-    th: 'th-TH',
-    tr: 'tr-TR',
-    uk: 'uk-UA',
-    vi: 'vi-VN',
-    zh: 'zh-CN'
-  };
-  var locale = locales[lang];
 
   var excludedInputs = 'input[type=button], input[type=submit], input[type=reset], input[type=hidden], .rich-edit';  // eslint-disable-line max-len
   var formExcludedInputs = excludedInputs + ', .input-like input';
@@ -556,18 +519,7 @@ $().ready(function() {  // eslint-disable-line max-statements
   // Initialize timeago.js
   new timeago().render($('.timeago'), lang);  // eslint-disable-line new-cap
 
-  // Initialize Summernote
-  $('.rich-edit').summernote({
-    lang   : locale,
-    toolbar: [
-      ['style', ['style']],
-      ['font', ['bold', 'underline', 'clear']],
-      ['color', ['color']],
-      // ['para', ['ul', 'ol', 'indent', 'outdent']],
-      ['para', ['ul', 'ol']],
-      ['insert', ['link']]
-      // ['help', ['help']]
-    ]
-  });
+  // Initialize WYSIWYG editor
+  // $('.rich-edit').summernote({...});
 });
 

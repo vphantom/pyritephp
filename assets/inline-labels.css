@@ -42,11 +42,6 @@ div.input-block .btn.no-label {
 	max-height: 3.5em;
 }
 
-/* Reset to btn-sm for Summernote */
-div.input-block .note-toolbar .btn {
-	padding: 5px 10px;
-}
-
 /* Work around Chrome brute forcing yellow on autofill since 2008 */
 :-webkit-autofill,
 :-webkit-autofill:hover,
