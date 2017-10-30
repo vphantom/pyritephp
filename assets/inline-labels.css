@@ -42,6 +42,10 @@ div.input-block .btn.no-label {
 	max-height: 3.5em;
 }
 
+.form-group label + label {
+	margin-left: 2em;
+}
+
 /* Work around Chrome brute forcing yellow on autofill since 2008 */
 :-webkit-autofill,
 :-webkit-autofill:hover,
