@@ -1,0 +1,11 @@
+@media print {
+
+	body {
+		padding-top: 0 !important;
+	}
+
+	.main {
+		margin-left: 1em !important;
+	}
+
+}
