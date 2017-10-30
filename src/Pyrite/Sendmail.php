@@ -161,7 +161,7 @@ class Sendmail
      * Insert/update an outbox e-mail
      *
      * @param int    $id       E-mail ID (null to create)
-     * @param int    $mailfrom Envelope sender
+     * @param int    $mailfrom Reply-To address
      * @param array  $to       Destination userIDs
      * @param array  $cc       Carbon-copy userIDs
      * @param array  $bcc      Blind carbon-copy userIDs
@@ -303,10 +303,9 @@ class Sendmail
      * This is the utility function which invokes Email() per se.
      *
      * Note that $file['path'] here is relative to the current document root.
-     * If $mailfrom is NULL, the default system sender from
-     * config.global.mail_from will be used.
+     * Note that config.global.mail is used for the From field at all times.
      *
-     * @param string $mailfrom Envelope sender
+     * @param string $mailfrom Reply-To address
      * @param string $to       Destination e-mail address(es) (or "Name <email"> combos)
      * @param string $cc       Carbon-copy addresses (set null or '' to avoid)
      * @param string $bcc      Blind carbon-copy addresses (null/'' to avoid)
@@ -329,10 +328,9 @@ class Sendmail
         if ($bcc && $bcc !== '') {
             $msg->bcc = $bcc;
         };
+        $msg->from = $PPHP['config']['global']['mail_from'];
         if ($mailfrom) {
-            $msg->from = $mailfrom;
-        } else {
-            $msg->from = $PPHP['config']['global']['mail_from'];
+            $msg->reply_to = $mailfrom;
         };
         $msg->subject = $subject;
         $msg->addTextHTML(filter('html_to_text', $html), $html);
