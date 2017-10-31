@@ -59,6 +59,7 @@ class AuditTrail
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 userId INTEGER NOT NULL DEFAULT '0',
+                actingUserId INTEGER NOT NULL DEFAULT '0',
                 ip VARCHAR(16) NOT NULL DEFAULT '127.0.0.1',
                 objectType VARCHAR(64) DEFAULT NULL,
                 objectId INTEGER DEFAULT NULL,
@@ -132,8 +133,11 @@ class AuditTrail
             $objectId = $PPHP['contextId'];
         };
 
-        if ($userId === 0  &&  isset($_SESSION['user']['id'])) {
-            $userId = $_SESSION['user']['id'];
+        if (isset($_SESSION['user']['id'])) {
+            $actingUserId = $_SESSION['user']['id'];
+            if ($userId === 0) {
+                $userId = $actingUserId;
+            };
         };
 
         // Enforce size limit on field values
@@ -143,10 +147,11 @@ class AuditTrail
         $db->exec(
             "
             INSERT INTO transactions
-            (userId, ip, objectType, objectId, action, fieldName, oldValue, newValue, content)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (actingUserId, userId, ip, objectType, objectId, action, fieldName, oldValue, newValue, content)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ",
             array(
+                $actingUserId,
                 $userId,
                 $ip,
                 $objectType,
