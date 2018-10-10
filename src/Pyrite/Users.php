@@ -274,6 +274,9 @@ class Users
             $cols['passwordHash'] = password_hash($cols['newpassword1'], PASSWORD_DEFAULT);
             // Entries 'newpassword[12]' will be safely skipped by $db->update()
         };
+        if (isset($cols['email'])) {
+            $cols['email'] = strtolower($cols['email']);
+        };
         $ott = '';
         $onetime = null;
         if (isset($cols['onetime'])) {
