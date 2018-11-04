@@ -264,7 +264,12 @@ class AuditTrail
         if ($end) {
             $conditions[] = $db->query("date(timestamp) <= date(?)", $end);
         };
-        $query->implode('AND', $conditions)->order_by('id ' . $order);
+        $query->implode('AND', $conditions);
+        if (isset($args['objectType']) && ($begin !== null || $end !== null)) {
+            $query->order_by("objectId $order, id $order");
+        } else {
+            $query->order_by('id ' . $order);
+        };
         if ($max !== null) {
             $query->limit($max);
         };
