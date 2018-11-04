@@ -637,6 +637,16 @@ on(
                     return trigger('http_status', 404);
                 };
 
+                if (isset($req['post']['user_loginlink'])) {
+                    return trigger(
+                        'render',
+                        'users_loginlink.html',
+                        array(
+                            'login_link' => ('login?' . http_build_query(array('email' => $user['email'], 'onetime' => grab('user_update', $user['id'], array('onetime' => true)))))
+                        )
+                    );
+                };
+
                 if (isset($req['post']['f'])) {
                     switch ($req['post']['f']) {
 
