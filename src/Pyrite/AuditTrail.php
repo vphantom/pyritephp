@@ -190,10 +190,12 @@ class AuditTrail
      * @param string|null     $order      Either 'DESC' or 'ASC'
      * @param int|null        $max        LIMIT rows returned
      * @param bool|null       $today      Restrict to current day
+     * @param string|null     $begin      Oldest admissible date or timestamp
+     * @param string|null     $end        Latest admissible date or timestamp
      *
      * @return array List of associative arrays, one per entry
      */
-    public static function get($userId, $objectType = null, $objectId = null, $action = null, $fieldName = null, $order = 'ASC', $max = null, $today = false)
+    public static function get($userId, $objectType = null, $objectId = null, $action = null, $fieldName = null, $order = 'ASC', $max = null, $today = false, $begin = null, $end = null)
     {
         global $PPHP;
         $db = $PPHP['db'];
@@ -213,6 +215,14 @@ class AuditTrail
                 $today = $args['today'];
                 unset($args['today']);
             };
+            if (isset($args['begin'])) {
+                $begin = $args['begin'];
+                unset($args['begin']);
+            };
+            if (isset($args['end'])) {
+                $end = $args['end'];
+                unset($args['end']);
+            };
         } else {
             if ($userId !== null)     $args['userId']     = $userId;
             if ($objectType !== null) $args['objectType'] = $objectType;
@@ -221,7 +231,7 @@ class AuditTrail
             if ($fieldName !== null)  $args['fieldName']  = $fieldName;
         };
 
-        if (count($args) < 1) {
+        if (count($args) < 1 && $begin === null && $end === null) {
             return array();
         };
 
@@ -247,6 +257,12 @@ class AuditTrail
         };
         if ($today) {
             $conditions[] = $db->query("date(timestamp)=date('now')");
+        };
+        if ($begin) {
+            $conditions[] = $db->query("date(timestamp) >= date(?)", $begin);
+        };
+        if ($end) {
+            $conditions[] = $db->query("date(timestamp) <= date(?)", $end);
         };
         $query->implode('AND', $conditions)->order_by('id ' . $order);
         if ($max !== null) {
