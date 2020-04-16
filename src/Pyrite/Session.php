@@ -107,6 +107,9 @@ class Session
         session_save_path($PPHP['dir'] . '/var/sessions');
         ini_set('session.cookie_lifetime', 0);  // Session
         ini_set('session.cookie_httponly', true);
+        if ($PPHP['config']['global']['use_ssl']) {
+            ini_set('session.cookie_secure', true);
+        };
         session_start();
         if (isset($_SESSION['magic'])) {
             if ($_SESSION['magic'] !== self::_magic()) {
