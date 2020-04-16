@@ -10,7 +10,7 @@
  * @category  Application
  * @package   PyritePHP
  * @author    Stéphane Lavergne <lis@imars.com>
- * @copyright 2016-2017 Stéphane Lavergne
+ * @copyright 2016-2020 Stéphane Lavergne
  * @license   https://opensource.org/licenses/MIT  MIT
  * @link      https://github.com/vphantom/pyritephp
  */
@@ -19,11 +19,11 @@ $GLOBALS['PPHP'] = array();
 
 global $PPHP;
 
-$PPHP['version'] = 'v1.2.23';
+$PPHP['version'] = 'v1.2.24';
 
 $PPHP['license'] = <<<EOS
 PyritePHP {$PPHP['version']}
-Copyright (c) 2017 Stephane Lavergne <https://github.com/vphantom>
+Copyright (c) 2016-2020 Stephane Lavergne <https://github.com/vphantom>
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,

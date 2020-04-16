@@ -1,6 +1,6 @@
 # PyritePHP
 
-[![license](https://img.shields.io/github/license/vphantom/pyritephp.svg?style=plastic)]() [![GitHub release](https://img.shields.io/github/release/vphantom/pyritephp.svg?style=plastic)]() [![Build Status](https://travis-ci.org/vphantom/pyritephp.svg?branch=v1.2.23)](https://travis-ci.org/vphantom/pyritephp) [![Coverage Status](https://coveralls.io/repos/github/vphantom/pyritephp/badge.svg?branch=v1.2.23)](https://coveralls.io/github/vphantom/pyritephp?branch=v1.2.23)
+[![license](https://img.shields.io/github/license/vphantom/pyritephp.svg?style=plastic)]() [![GitHub release](https://img.shields.io/github/release/vphantom/pyritephp.svg?style=plastic)]() [![Build Status](https://travis-ci.org/vphantom/pyritephp.svg?branch=v1.2.24)](https://travis-ci.org/vphantom/pyritephp) [![Coverage Status](https://coveralls.io/repos/github/vphantom/pyritephp/badge.svg?branch=v1.2.24)](https://coveralls.io/github/vphantom/pyritephp?branch=v1.2.24)
 
 PHP 5 and Bootstrap 3 framework to kick-start multilingual web application development
 
@@ -184,7 +184,7 @@ This application would not have been possible within a reasonable time frame wit
 
 ## MIT License
 
-Copyright (c) 2016-2017 Stephane Lavergne <https://github.com/vphantom>
+Copyright (c) 2016-2020 Stephane Lavergne <https://github.com/vphantom>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
