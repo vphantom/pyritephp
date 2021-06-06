@@ -896,10 +896,11 @@ on(
      * @param array|null  $args     Arguments to pass to template
      * @param string|null $onetime  Don't generate onetime, use this one
      * @param bool|null   $nodelay  Bypass outbox and send immediately
+     * @param string|null $sendto   Send to this e-mail address instead
      *
      * @return bool|int The result of event 'sendmail'
      */
-    function ($template, $userId, $args = array(), $onetime = null, $nodelay = false) {
+    function ($template, $userId, $args = array(), $onetime = null, $nodelay = false, $sendto = false) {
         global $PPHP;
         $config = $PPHP['config'];
         if ($onetime === null) {
@@ -911,6 +912,6 @@ on(
         };
         $link = 'login?' . http_build_query(array( 'email' => $user['email'], 'onetime' => $onetime));
         $args['validation_link'] = $link;
-        return grab('sendmail', $userId, null, null, $template, $args, array(), $nodelay);
+        return grab('sendmail', ($sendto ? $sendto : $userId), null, null, $template, $args, array(), $nodelay);
     }
 );
