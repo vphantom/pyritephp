@@ -19,11 +19,11 @@ $GLOBALS['PPHP'] = array();
 
 global $PPHP;
 
-$PPHP['version'] = 'v1.2.24';
+$PPHP['version'] = 'v1.2.25';
 
 $PPHP['license'] = <<<EOS
 PyritePHP {$PPHP['version']}
-Copyright (c) 2016-2020 Stephane Lavergne <https://github.com/vphantom>
+Copyright (c) 2016-2021 Stephane Lavergne <https://github.com/vphantom>
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
