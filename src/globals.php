@@ -469,6 +469,13 @@ on(
             $created = true;
             $req['post']['email'] = filter('clean_email', $req['post']['email']);
             $req['post']['name'] = filter('clean_name', $req['post']['name']);
+
+            if (isset($config['global']['mail_reject'])
+                && preg_match($config['global']['mail_reject'], $req['post']['email']) == 1
+            ) {
+                return trigger('http_status', 403);
+            };
+
             if (($newbie = grab('user_create', $req['post'])) !== false) {
                 $id = $newbie[0];
                 $success = true;
