@@ -71,6 +71,12 @@ class AuditTrail
             )
             "
         );
+        $db->exec(
+            "
+            CREATE INDEX idx_txn_peers
+                ON transactions (userId, objectType, action, newValue)
+            "
+        );
         $db->commit();
         self::add(null, null, 'installed');
         echo "    done!\n";
